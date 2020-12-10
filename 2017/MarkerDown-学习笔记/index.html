@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/Levin-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Levin-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Levin-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levin000.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","width":249,"display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="题前篇:         第一篇博客写点什么呢？这是一个问题，好在我还是一个小白，对于很多前端的交互存在很多好奇的地方，这第一篇文章就写一篇关于一个轻量级的文字编辑工具MarkDown的日志吧。再次声明我也是一个小白，这篇笔记更加偏向于是和大家分享我在学习MarkDown过程中遇到的一些问题和解决方法。在文章的开头要感谢在学习MarkDown过程中参考过的blog以及一些document，这里我把">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MarkerDown-学习笔记">
+<meta property="og:url" content="http://levin000.github.io/2017/MarkerDown-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="题前篇:         第一篇博客写点什么呢？这是一个问题，好在我还是一个小白，对于很多前端的交互存在很多好奇的地方，这第一篇文章就写一篇关于一个轻量级的文字编辑工具MarkDown的日志吧。再次声明我也是一个小白，这篇笔记更加偏向于是和大家分享我在学习MarkDown过程中遇到的一些问题和解决方法。在文章的开头要感谢在学习MarkDown过程中参考过的blog以及一些document，这里我把">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ww2.sinaimg.cn/large/56d258bdjw1eugeubg8ujj21kw16odn6.jpg">
+<meta property="article:published_time" content="2017-12-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2017-12-28T16:00:00.000Z">
+<meta property="article:author" content="Levin">
+<meta property="article:tag" content="Markdown">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ww2.sinaimg.cn/large/56d258bdjw1eugeubg8ujj21kw16odn6.jpg">
+
+<link rel="canonical" href="http://levin000.github.io/2017/MarkerDown-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>MarkerDown-学习笔记 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">心无旁骛</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://levin000.github.io/2017/MarkerDown-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Levin">
+      <meta itemprop="description" content="As simple as possible,<br> As complex as needed!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MarkerDown-学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-12-27 00:00:00" itemprop="dateCreated datePublished" datetime="2017-12-27T00:00:00+08:00">2017-12-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2017-12-29 00:00:00" itemprop="dateModified" datetime="2017-12-29T00:00:00+08:00">2017-12-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AF%8C%E6%96%87%E6%9C%AC/" itemprop="url" rel="index"><span itemprop="name">富文本</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>题前篇:</strong>        </p>
+<p>第一篇博客写点什么呢？这是一个问题，好在我还是一个小白，对于很多前端的交互存在很多好奇的地方，这第一篇文章就写一篇关于一个轻量级的文字编辑工具MarkDown的日志吧。再次声明我也是一个小白，这篇笔记更加偏向于是和大家分享我在学习MarkDown过程中遇到的一些问题和解决方法。在文章的开头要感谢在学习MarkDown过程中参考过的blog以及一些document，这里我把他们的链接列在这里。<br><a target="_blank" rel="noopener" href="http://blog.leanote.com/post/freewalk/Markdown-%E8%AF%AD%E6%B3%95%E6%89%8B%E5%86%8C#title" title="梵居闹市">Markdown 语法手册 （完整整理版）</a><br><a target="_blank" rel="noopener" href="http://einverne.github.io/markdown-style-guide/zh.html">Markdown 书写风格指南</a><br><a target="_blank" rel="noopener" href="https://www.zybuluo.com/static/editor/cmd-manual.pdf" title="Cmd Markdown">Cmd Markdown 简明语法手册</a>      </p>
+<h2 id="斜体和粗体"><a href="#斜体和粗体" class="headerlink" title="斜体和粗体"></a><strong>斜体和粗体</strong></h2><p>使用 * 和 ** 表示斜体和粗体。   </p>
+<p>代码示例：  <code>*斜体*</code><br>显示样式：   <em>斜体</em>  </p>
+<a id="more"></a>
+
+<p>代码示例：  <code>**粗体**</code><br>显示样式：  <strong>粗体</strong></p>
+<h2 id="分级标题"><a href="#分级标题" class="headerlink" title="分级标题"></a><strong>分级标题</strong></h2><p>两种分级标题写作方式</p>
+<ul>
+<li><p>使用 === 表示一级标题，使用 — 表示二级标题。</p>
+<p>代码示例：</p>
+<pre><code>一级标题  `========`
+二级标题  `-----------`</code></pre>
+</li>
+</ul>
+<ul>
+<li><p>使用 #、 ##、 ###、 ####、 #####、 ###### 表示1-6级标题</p>
+<p>代码示例：  </p>
+<pre><code>一级标题 `#`
+二级标题 `##`
+三级标题 `###`
+四级标题 `####`
+五级标题 `#####`
+六级标题 `######`</code></pre>
+</li>
+</ul>
+<p>这里就不演示了，可在编辑器中观察，很简单，一级标题字号最大，依级递减。</p>
+<h2 id="超链接"><a href="#超链接" class="headerlink" title="超链接"></a><strong>超链接</strong></h2><p>Markdown 支持两种形式的链接语法：行内式和参考式。行内式一般使用较多</p>
+<ul>
+<li><p><strong>行内式</strong>  </p>
+<p>语法说明：</p>
+<p>形如：<code>[链接文字]\(链接地址 “链接标题”)</code>。<code>[]</code>里写链接文字，<code>()</code>里写链接地址,<code>()</code>中的<code>“”</code>中可以为链接指定title属性，title属性可加可不加。title属性的效果是鼠标悬停在链接上会出现指定的title文字。链接地址与链接标题之间有一个空格。</p>
+<p>代码示例：</p>
+<p><code>欢迎来到[Qdd Blog](https://walcer.github.io/)</code>  </p>
+<p>显示样式：</p>
+<blockquote>
+<p>欢迎来到<a target="_blank" rel="noopener" href="https://walcer.github.io/">Qdd Blog</a>  </p>
+</blockquote>
+<p>代码示例：</p>
+<p><code>欢迎来到[Qdd Blog](https://walcer.github.io/ &quot;Qdd Blog&quot;)</code><br>显示样式：</p>
+<blockquote>
+<p>欢迎来到<a target="_blank" rel="noopener" href="https://walcer.github.io/" title="Qdd Blog">Qdd Blog</a>  </p>
+</blockquote>
+</li>
+<li><p><strong>参考式</strong></p>
+<p>参考式超链接一般用在学术论文上面，或者另一种情况，如果某一个链接在文章中多处使用，那么使用引用的方式创建链接将非常好，它可以让你对链接进行统一的管理。</p>
+<p>语法说明：</p>
+<p>参考式链接分为两部分，文中的写法<code>[链接文字]\[链接标记]</code>，在文本的任意位置添加<code>[链接标记]: 链接地址“链接标题”</code>，链接地址与链接标题之间有一个空格。</p>
+<p>如果链接文字本身可以做为链接标记，你也可以写成[链接文字][][链接文字]：链接地址的形式，见代码的最后一行。</p>
+<p>代码示例：</p>
+<p><code>我经常去的几个网站[ResearchGate][1]、[GitHub][2]以及[自己的博客][3][GitHub][2]是一个不错的[网站][]。</code><br><code>[1]: https://www.researchgate.net/ &quot;ResearchGate&quot;</code><br><code>[2]: https://github.com/ &quot;GitHub&quot;</code><br><code>[3]: http://qddblog.top/ &quot;Qdd blog&quot;</code><br><code>[网站]: http://qindiandadudu.ltd/</code></p>
+<p>显示样式：</p>
+<p>我经常去的几个网站<a target="_blank" rel="noopener" href="https://www.researchgate.net/" title="ResearchGate">ResearchGate</a>、<a target="_blank" rel="noopener" href="https://github.com/" title="GitHub">GitHub</a>以及<a target="_blank" rel="noopener" href="http://qindiandadudu.ltd/" title="Qdd blog">自己的博客</a><br><a target="_blank" rel="noopener" href="https://github.com/" title="GitHub">GitHub</a>是一个不错的<a target="_blank" rel="noopener" href="http://qindiandadudu.ltd/">网站</a>。  </p>
+</li>
+</ul>
+<h2 id="自动链接"><a href="#自动链接" class="headerlink" title="自动链接"></a><strong>自动链接</strong></h2><p>  语法说明：</p>
+<p>  Markdown支持以比较简短的自动链接形式来处理网址和电子邮件信箱，只要是用&lt;&gt;包起来，Markdown就会自动把它转成链接。一般网址的链接文字就和链接地址一样，例如：</p>
+<p>  代码示例：</p>
+<p>  <code>&lt;http://example.com/&gt;</code><br>  <code>&lt;address@example.com&gt;</code>  </p>
+<p>  显示样式：</p>
+<p>  <a target="_blank" rel="noopener" href="http://example.com/">http://example.com/</a><br>  <a href="mailto:&#97;&#100;&#x64;&#114;&#x65;&#115;&#115;&#x40;&#101;&#x78;&#x61;&#109;&#112;&#108;&#x65;&#x2e;&#99;&#x6f;&#109;">&#97;&#100;&#x64;&#114;&#x65;&#115;&#115;&#x40;&#101;&#x78;&#x61;&#109;&#112;&#108;&#x65;&#x2e;&#99;&#x6f;&#109;</a></p>
+<h2 id="锚点"><a href="#锚点" class="headerlink" title="锚点"></a><strong>锚点</strong></h2><p>网页中，锚点其实就是页内超链接，也就是链接本文档内部的某些元素，实现当前页面中的跳转。比如我这里写下一个锚点，点击回到目录，就能跳转到目录。 在目录中点击这一节，就能跳过来。还有下一节的注脚。这些根本上都是用锚点来实现的。</p>
+<ul>
+<li><p><strong>注意：</strong></p>
+<p><code>1. Markdown Extra 只支持在标题后插入锚点，其它地方无效。</code></p>
+<p>语法说明：</p>
+<p>在你准备跳转到的指定标题后插入锚点，然后在文档的其它地方写上连接到锚点的链接。      </p>
+<p>代码示例：</p>
+<p><code>跳转到[超链接]() （其中锚点设置为“## 超链接 #index”）</code></p>
+<p>显示样式：</p>
+<blockquote>
+<p>跳转到<a href="#index">超链接</a></p>
+</blockquote>
+</li>
+</ul>
+<h2 id="列表"><a href="#列表" class="headerlink" title="列表"></a><strong>列表</strong></h2><p>  列表主要分类有三种：无序列表、有序列表、定义型列表    </p>
+<ul>
+<li><p><strong>无序列表</strong>  </p>
+<p>语法说明：</p>
+<p>使用 <code>*、 +、 -</code> 表示无序列表    </p>
+<p>代码示例：</p>
+<p><code>* 无序列表项 一 </code><br><code>+ 无序列表项 二</code><br><code>- 无序列表项 三</code></p>
+<p>显示样式：</p>
+<ul>
+<li>无序列表 一  </li>
+</ul>
+<ul>
+<li>无序列表 二  </li>
+</ul>
+<ul>
+<li>无序列表 三  </li>
+</ul>
+</li>
+<li><p><strong>有序列表</strong></p>
+<p>语法说明：</p>
+<p>有序列表则使用数字接着一个英文句点(数字的大小顺序无关紧要)。   </p>
+<p>代码示例：</p>
+<p><code>1. 有序列表项 一</code><br><code>2. 有序列表项 二</code><br><code>3. 有序列表项 三</code></p>
+<p>显示样式：</p>
+<ol>
+<li>有序列表项 一    </li>
+<li>有序列表项 二    </li>
+<li>有序列表项 三    </li>
+</ol>
+</li>
+<li><p><strong>定义型列表</strong></p>
+<p>语法说明：</p>
+<p>定义型列表由名词和解释组成。一行写上定义，紧跟一行写上解释。解释的写法:紧跟一个缩进(Tab)   </p>
+<p>代码示例：</p>
+<p><code>Markdown:    轻量级文本标记语言，可以转换成html，pdf等格式（左侧有一个可见的冒号和四个不可见的空格）</code></p>
+<p><code>代码块2:    这是代码块的定义（左侧有一个可见的冒号和四个不可见的空格） 代码块（左侧有八个不可见的空格）</code>     </p>
+<p>显示样式：</p>
+<blockquote>
+<dl><dt>Markdown</dt><dd>轻量级文本标记语言，可以转换成html，pdf等格式（左侧有一个可见的冒号和四个不可见的空格）</dd></dl></blockquote>
+<blockquote>
+<dl><dt>代码块 2</dt><dd>这是代码块的定义（左侧有一个可见的冒号和四个不可见的空格）</dd></dl><pre><code>    代码块（左侧有八个不可见的空格）</code></pre>
+</blockquote>
+</li>
+<li><p><strong>列表缩进</strong>  </p>
+<p>语法说明：</p>
+<p>列表项目标记通常是放在最左边，但是其实也可以缩进，最多 3 个空格，项目标记后面则一定要接着至少一个空格或制表符。</p>
+<p>要让列表看起来更漂亮，你可以把内容用固定的缩进整理好（显示效果与代码一致）：</p>
+<p>代码示例：</p>
+<p><code>   轻轻的我走了， 正如我轻轻的来； 我轻轻的招手， 作别西天的云彩。</code><br><code>   那河畔的金柳， 是夕阳中的新娘； 波光里的艳影， 在我的心头荡漾。</code><br><code>   软泥上的青荇， 油油的在水底招摇； 在康河的柔波里， 我甘心做一条水草！</code><br><code>   那榆荫下的一潭， 不是清泉， 是天上虹； 揉碎在浮藻间， 沉淀着彩虹似的梦。</code><br><code>   寻梦？撑一支长篙， 向青草更青处漫溯； 满载一船星辉， 在星辉斑斓里放歌。</code><br><code>   但我不能放歌， 悄悄是别离的笙箫； 夏虫也为我沉默， 沉默是今晚的康桥！</code><br><code>   悄悄的我走了， 正如我悄悄的来； 我挥一挥衣袖， 不带走一片云彩。</code></p>
+<p>显示样式：</p>
+<pre><code>轻轻的我走了， 正如我轻轻的来； 我轻轻的招手， 作别西天的云彩。
+那河畔的金柳， 是夕阳中的新娘； 波光里的艳影， 在我的心头荡漾。 
+软泥上的青荇， 油油的在水底招摇； 在康河的柔波里， 我甘心做一条水草！ 
+那榆荫下的一潭， 不是清泉， 是天上虹； 揉碎在浮藻间， 沉淀着彩虹似的梦。 
+寻梦？撑一支长篙， 向青草更青处漫溯； 满载一船星辉， 在星辉斑斓里放歌。 
+但我不能放歌， 悄悄是别离的笙箫； 夏虫也为我沉默， 沉默是今晚的康桥！ 
+悄悄的我走了， 正如我悄悄的来； 我挥一挥衣袖， 不带走一片云彩。</code></pre>
+</li>
+<li><p><strong>包含段落的列表</strong>  </p>
+<p>语法说明：</p>
+<p>列表项目可以包含多个段落，每个项目下的段落都必须缩进 4 个空格或是 1 个制表符（显示效果与代码一致）：</p>
+<p>代码示例：</p>
+<p><code>  *   轻轻的我走了， 正如我轻轻的来； 我轻轻的招手， 作别西天的云彩。</code><br><code>那河畔的金柳， 是夕阳中的新娘； 波光里的艳影， 在我的心头荡漾。</code><br><code>软泥上的青荇， 油油的在水底招摇； 在康河的柔波里， 我甘心做一条水草！</code><br><code>*   那榆荫下的一潭， 不是清泉， 是天上虹； 揉碎在浮藻间， 沉淀着彩虹似的梦。</code><br><code>寻梦？撑一支长篙， 向青草更青处漫溯； 满载一船星辉， 在星辉斑斓里放歌。</code><br><code>但我不能放歌， 悄悄是别离的笙箫； 夏虫也为我沉默， 沉默是今晚的康桥!</code><br><code>悄悄的我走了， 正如我悄悄的来； 我挥一挥衣袖， 不带走一片云彩。</code></p>
+</li>
+</ul>
+<pre><code>如果你每行都有缩进，看起来会看好很多，当然，再次地，如果你很懒惰，Markdown 也允许：
+
+显示样式：
+
+&gt; *   轻轻的我走了， 正如我轻轻的来； 我轻轻的招手， 作别西天的云彩。
+那河畔的金柳， 是夕阳中的新娘； 波光里的艳影， 在我的心头荡漾。 
+软泥上的青荇， 油油的在水底招摇； 在康河的柔波里， 我甘心做一条水草！
+&gt; *   那榆荫下的一潭， 不是清泉， 是天上虹； 揉碎在浮藻间， 沉淀着彩虹似的梦。 
+寻梦？撑一支长篙， 向青草更青处漫溯； 满载一船星辉， 在星辉斑斓里放歌。
+但我不能放歌， 悄悄是别离的笙箫； 夏虫也为我沉默， 沉默是今晚的康桥！ 
+悄悄的我走了， 正如我悄悄的来； 我挥一挥衣袖， 不带走一片云彩。</code></pre>
+<ul>
+<li><p><strong>包含引用的列表</strong></p>
+<p>语法说明：</p>
+<p>如果要在列表项目内放进引用，那 &gt; 就需要缩进：</p>
+<p>代码示例：</p>
+<p><code>阅读的方法:</code><br><code>&gt; 打开书本</code><br><code>&gt; 打开电灯</code></p>
+<p>显示样式：</p>
+<blockquote>
+<p> 阅读的方法     </p>
+<blockquote>
+<p> 打开书本<br> 打开电灯     </p>
+</blockquote>
+</blockquote>
+</li>
+<li><p><strong>包含代码区块的引用</strong>   </p>
+<p>语法说明：</p>
+<p>如果要放代码区块的话，该区块就需要缩进两次，也就是 8 个空格或是 2 个制表符：          </p>
+<p>代码示例：</p>
+<p><code>    一列表项包含一个列表区块：</code><br><code>&lt;代码写在这&gt;</code>       </p>
+<p>显示效果：</p>
+<ul>
+<li>一列表项包含一个列表区块：<br>&lt;代码写在这&gt;</li>
+</ul>
+</li>
+<li><p><strong>一个特殊情况</strong><br>在特殊情况下，项目列表很可能会不小心产生，像是下面这样的写法：</p>
+<p><code>1986. What a great season.</code></p>
+<p>会显示成：  </p>
+<blockquote>
+<ol start="1986">
+<li>What a great season.</li>
+</ol>
+</blockquote>
+<p>换句话说，也就是在行首出现数字-句点-空白，要避免这样的状况，你可以在句点前面加上反斜杠：</p>
+<p><code>1986\. What a great season.</code></p>
+<p>会显示成：</p>
+<blockquote>
+<p>1986. What a great season.</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>   语法说明：</p>
+<p>   引用需要在被引用的文本前加上&gt;符号。    </p>
+<p>   代码示例：</p>
+<p>   <code>&gt; 这是一个有两段文字的引用,</code><br>   <code>&gt; 无意义的占行文字1.</code><br>   <code>&gt; 无意义的占行文字2.</code></p>
+<p>   <code>&gt; 无意义的占行文字3.</code><br>   <code>&gt; 无意义的占行文字4.</code></p>
+<p>   显示样式：</p>
+<blockquote>
+<p>这是一个有两段文字的引用,<br>无意义的占行文字1.<br>无意义的占行文字2.    </p>
+</blockquote>
+<blockquote>
+<p>无意义的占行文字3.<br>无意义的占行文字4.    </p>
+</blockquote>
+<p>   Markdown 也允许你偷懒只在整个段落的第一行最前面加上 &gt; ：    </p>
+<p>   代码示例：</p>
+<p>   <code>&gt; 这是一个有两段文字的引用,</code><br>   <code>无意义的占行文字1.</code><br>   <code>无意义的占行文字2.</code></p>
+<p>   <code>&gt; 无意义的占行文字3.</code><br>   <code>无意义的占行文字4.</code></p>
+<p>   显示样式：</p>
+<blockquote>
+<p>这是一个有两段文字的引用,<br>   无意义的占行文字1.<br>   无意义的占行文字2.    </p>
+</blockquote>
+<blockquote>
+<p>无意义的占行文字3.<br>   无意义的占行文字4.    </p>
+</blockquote>
+<ul>
+<li><p><strong>引用的多层嵌套</strong>    </p>
+<p>语法说明：</p>
+<p>区块引用可以嵌套（例如：引用内的引用），只要根据层次加上不同数量的&gt;：    </p>
+<p>代码示例：</p>
+<p><code>&gt;&gt;&gt; 请问 Markdwon 怎么用？ - 小白</code><br><code>&gt;&gt;</code><br><code>&gt;&gt; 自己看教程！ - 愤青</code><br><code>&gt;</code><br><code>&gt; 教程在哪？ - 小白</code></p>
+<p>显示样式：</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>请问 Markdwon 怎么用？ - 小白    </p>
+</blockquote>
+<p>自己看教程！ - 愤青    </p>
+</blockquote>
+<p>教程在哪？ - 小白    </p>
+</blockquote>
+</li>
+<li><p><strong>引用其它要素</strong>    </p>
+<p>语法说明：</p>
+<p>引用的区块内也可以使用其他的 Markdown 语法，包括标题、列表、代码区块等：    </p>
+<p>代码示例：</p>
+<p><code>&gt; 1.   这是第一行列表项。</code><br><code>&gt; 2.   这是第二行列表项。</code><br><code>&gt; </code><br><code>&gt; 给出一些例子代码：</code><br><code>&gt; </code><br><code>&gt;     return shell_exec(&quot;echo $input | $markdown_script&quot;);</code></p>
+<p>显示样式：</p>
+<blockquote>
+<ol>
+<li>  这是第一行列表项。    </li>
+<li>  这是第二行列表项。    </li>
+</ol>
+<p>给出一些例子代码：     </p>
+<p><code>return shell_exec(&quot;echo $input | $markdown_script&quot;);</code>      </p>
+</blockquote>
+</li>
+</ul>
+<h2 id="插入图像"><a href="#插入图像" class="headerlink" title="插入图像"></a>插入图像</h2><p>图片的创建方式与超链接相似，而且和超链接一样也有两种写法，<strong>行内式</strong>和<strong>参考式</strong>写法。语法中<strong>图片Alt</strong>的意思是如果图片因为某些原因不能显示，就用定义的图片Alt文字来代替图片。<strong>图片Title</strong>则和链接中的Title一样，表示鼠标悬停与图片上时出现的文字。 Alt 和 Title 都不是必须的，**<em>可以省略，但建议写上**</em>。</p>
+<ul>
+<li><p><strong>行内式</strong>    </p>
+<p>语法说明：</p>
+<p><code>![图片Alt](图片地址 “图片Title”)</code>    </p>
+<p>代码示例：</p>
+<p><code>美丽花儿：</code><br><code>![美丽花儿Alt](http://ww2.sinaimg.cn/large/56d258bdjw1eugeubg8ujj21kw16odn6.jpg &quot;美丽花儿&quot;)</code></p>
+<p>显示样式：</p>
+<p>美丽花儿：<br><img src="http://ww2.sinaimg.cn/large/56d258bdjw1eugeubg8ujj21kw16odn6.jpg" alt="美丽花儿Alt" title="美丽花儿">     </p>
+</li>
+<li><p><strong>参考式</strong></p>
+<p>语法说明：</p>
+<p>在文档要插入图片的地方写 <code>![图片Alt]\[标记]      </code><br>在文档的最后写上<code>[标记]:图片地址 “Title”</code></p>
+<p> 代码：</p>
+<p> <code>美丽花儿：</code><br> <code>![美丽花儿Alt][flower]</code></p>
+<p> <code>[flower]:http://ww2.sinaimg.cn/large/56d258bdjw1eugeubg8ujj21kw16odn6.jpg  &quot;美丽花儿&quot;</code></p>
+</li>
+</ul>
+<pre><code> 显示效果：
+
+ 美丽花儿:    
+ ![美丽花儿Alt][flower]    
+
+ [flower]:http://ww2.sinaimg.cn/large/56d258bdjw1eugeubg8ujj21kw16odn6.jpg &quot;美丽花儿&quot;    </code></pre>
+<h2 id="内容目录"><a href="#内容目录" class="headerlink" title="内容目录"></a>内容目录</h2><p>在段落中填写 [TOC]以显示全文内容的目录结构。效果参见最上方的目录    </p>
+<h2 id="注脚"><a href="#注脚" class="headerlink" title="注脚"></a>注脚</h2><p>  语法说明：</p>
+<p>  在需要添加注脚的文字后加上脚注名字 <code>[^注脚名字]</code>,称为加注。然后在文本的任意位置(一般在最后)添加脚注，脚注前必须有对应的脚注名字。注意：经测试注脚与注脚之间必须空一行，不然会失效。成功后会发现，即使你没有把注脚写在文末，经Markdown转换后，也会自动归类到文章的最后。</p>
+<p>  <strong><em>代码示例：</em></strong>    </p>
+<p>  <code>使用 Markdown[^1]可以效率的书写文档, 直接转换成 HTML[^2], 你可以使用 Cmd Markdown[^Le] 编辑器进行书写。</code><br>  <code>[^1]:Markdown是一种纯文本标记语言</code><br>  <code>[^2]:HyperText Markup Language 超文本标记语言</code><br>  <code>[^Le]:开源笔记平台，支持Markdown和笔记</code></p>
+<p>  显示样式：</p>
+<p>  使用 Markdown<a href="Markdown%E6%98%AF%E4%B8%80%E7%A7%8D%E7%BA%AF%E6%96%87%E6%9C%AC%E6%A0%87%E8%AE%B0%E8%AF%AD%E8%A8%80">^1</a>可以效率的书写文档, 直接转换成 HTML[^2], 你可以使用 Cmd Markdown<a href="%E5%BC%80%E6%BA%90%E7%AC%94%E8%AE%B0%E5%B9%B3%E5%8F%B0%EF%BC%8C%E6%94%AF%E6%8C%81Markdown%E5%92%8C%E7%AC%94%E8%AE%B0">^Le</a> 编辑器进行书写。    </p>
+<p>  [^2]:HyperText Markup Language 超文本标记语言    </p>
+<p>  <strong>注：</strong> 脚注自动被搬运到最后面，请到文章末尾查看，并且脚注后方的链接可以直接跳转回到加注的地方。    </p>
+<h2 id="LaTeX-公式"><a href="#LaTeX-公式" class="headerlink" title="LaTeX 公式"></a>LaTeX 公式</h2><pre><code>$E = m2$
+
+更多使用方法，欢迎访问 [MathJax](https://math.meta.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference &quot;mathjax-basic-tutorial-and-quick-reference&quot;) 参考更多使用方法。</code></pre>
+<h2 id="表格"><a href="#表格" class="headerlink" title="表格"></a>表格</h2><p>  语法说明：</p>
+<ol>
+<li><p>不管是哪种方式，第一行为表头，第二行分隔表头和主体部分，第三行开始每一行为一个表格行。    </p>
+</li>
+<li><p>列于列之间用管道符|隔开。原生方式的表格每一行的两边也要有管道符。    </p>
+</li>
+<li><p>第二行还可以为不同的列指定对齐方向。默认为左对齐，在-右边加上:就右对齐。    </p>
+<p>代码示例：</p>
+<blockquote>
+<p>简单方式写表格：<br><code>学号|姓名|分数</code><br><code>-|-|-</code><br><code>小明|男|75</code><br><code>小红|女|79</code><br><code>小陆|男|92</code></p>
+</blockquote>
+<blockquote>
+<p>原生方式写表格：<br><code>|学号|姓名|分数|</code><br><code>|-|-|-|</code><br><code>|小明|男|75|</code><br><code>|小红|女|79|</code><br><code>|小陆|男|92|</code></p>
+</blockquote>
+<blockquote>
+<p>为表格第二列指定方向：<br><code>产品|价格</code><br><code>-|-:</code><br><code>Leanote 高级账号|60元/年</code><br><code>Leanote 超级账号|120元/年</code></p>
+</blockquote>
+</li>
+</ol>
+<p>  显示样式:</p>
+<blockquote>
+<p>简单方式写表格：    </p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>学号</th>
+<th>姓名</th>
+<th>分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>小明</td>
+<td>男</td>
+<td>75</td>
+</tr>
+<tr>
+<td>小红</td>
+<td>女</td>
+<td>79</td>
+</tr>
+<tr>
+<td>小陆</td>
+<td>男</td>
+<td>92</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>原生方式写表格：    </p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>学号</th>
+<th>姓名</th>
+<th>分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>小明</td>
+<td>男</td>
+<td>75</td>
+</tr>
+<tr>
+<td>小红</td>
+<td>女</td>
+<td>79</td>
+</tr>
+<tr>
+<td>小陆</td>
+<td>男</td>
+<td>92</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>为表格第二列指定方向：    </p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>产品</th>
+<th align="right">价格</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Leanote 高级账号</td>
+<td align="right">60元/年</td>
+</tr>
+<tr>
+<td>Leanote 超级账号</td>
+<td align="right">120元/年</td>
+</tr>
+</tbody></table>
+<h2 id="分隔线"><a href="#分隔线" class="headerlink" title="分隔线"></a>分隔线</h2><p>  你可以在一行中用<strong>三个以上</strong>的*<strong>星号**<em>、</em></strong>减号*<strong>、**<em>底线</em></strong>来建立一个分隔线，<strong>行内不能有其他东西</strong>。你也<strong>可以在星号或是减号中间插入空格</strong>。下面每种写法都可以建立分隔线：    </p>
+<p>  代码示例：</p>
+<p>  <code>* * *</code><br>  <code>***</code><br>  <code>*****</code><br>  <code>- - -</code><br>  <code>---------------------------------------</code></p>
+<p>  显示样式：</p>
+<blockquote>
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+</blockquote>
+<hr>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Levin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://levin000.github.io/2017/MarkerDown-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="MarkerDown-学习笔记">http://levin000.github.io/2017/MarkerDown-学习笔记/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Markdown/" rel="tag"><i class="fa fa-tag"></i> Markdown</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2018/%E5%93%A8%E5%85%B5%E9%81%A5%E6%84%9F%E6%95%B0%E6%8D%AE%E7%88%AC%E5%8F%96/" rel="next" title="哨兵遥感数据爬取Python实现">
+      哨兵遥感数据爬取Python实现 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%9C%E4%BD%93%E5%92%8C%E7%B2%97%E4%BD%93"><span class="nav-number">1.</span> <span class="nav-text">斜体和粗体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%BA%A7%E6%A0%87%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">分级标题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B6%85%E9%93%BE%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">超链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E9%93%BE%E6%8E%A5"><span class="nav-number">4.</span> <span class="nav-text">自动链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%9A%E7%82%B9"><span class="nav-number">5.</span> <span class="nav-text">锚点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%97%E8%A1%A8"><span class="nav-number">6.</span> <span class="nav-text">列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E7%94%A8"><span class="nav-number">7.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%9B%BE%E5%83%8F"><span class="nav-number">8.</span> <span class="nav-text">插入图像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%9B%AE%E5%BD%95"><span class="nav-number">9.</span> <span class="nav-text">内容目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%A8%E8%84%9A"><span class="nav-number">10.</span> <span class="nav-text">注脚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LaTeX-%E5%85%AC%E5%BC%8F"><span class="nav-number">11.</span> <span class="nav-text">LaTeX 公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A8%E6%A0%BC"><span class="nav-number">12.</span> <span class="nav-text">表格</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E9%9A%94%E7%BA%BF"><span class="nav-number">13.</span> <span class="nav-text">分隔线</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Levin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Levin</p>
+  <div class="site-description" itemprop="description">As simple as possible,<br> As complex as needed!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/leibin_w@163.com" title="E-Mail → leibin_w@163.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Levin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">37k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">34 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>

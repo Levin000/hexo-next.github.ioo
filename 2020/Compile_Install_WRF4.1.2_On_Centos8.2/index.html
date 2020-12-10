@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/Levin-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Levin-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Levin-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levin000.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","width":249,"display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. Install “GNU Tools” and “gfortran”&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;dnf -y install gccdnf -y install cpp gcc-c++dnf -y install gcc-gfortrandnf -y install unzip bzip2 time nf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Compile &amp; Install WRF4.1.2 On CentOS 8.2">
+<meta property="og:url" content="http://levin000.github.io/2020/Compile_Install_WRF4.1.2_On_Centos8.2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1. Install “GNU Tools” and “gfortran”&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;dnf -y install gccdnf -y install cpp gcc-c++dnf -y install gcc-gfortrandnf -y install unzip bzip2 time nf">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://levin000.github.io/images/wrf/wrf_logo.jpg">
+<meta property="article:published_time" content="2020-06-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-06-17T16:00:00.000Z">
+<meta property="article:author" content="Levin">
+<meta property="article:tag" content="模式">
+<meta property="article:tag" content="region climate model">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="CentOS">
+<meta property="article:tag" content="Weather Research and Forcast Model">
+<meta property="article:tag" content="WRF">
+<meta property="article:tag" content="gfortran">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://levin000.github.io/images/wrf/wrf_logo.jpg">
+
+<link rel="canonical" href="http://levin000.github.io/2020/Compile_Install_WRF4.1.2_On_Centos8.2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Compile & Install WRF4.1.2 On CentOS 8.2 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">心无旁骛</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://levin000.github.io/2020/Compile_Install_WRF4.1.2_On_Centos8.2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Levin">
+      <meta itemprop="description" content="As simple as possible,<br> As complex as needed!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Compile & Install WRF4.1.2 On CentOS 8.2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-08 00:00:00" itemprop="dateCreated datePublished" datetime="2020-06-08T00:00:00+08:00">2020-06-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-06-18 00:00:00" itemprop="dateModified" datetime="2020-06-18T00:00:00+08:00">2020-06-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%A8%A1%E5%9E%8B%E6%A8%A1%E6%8B%9F/" itemprop="url" rel="index"><span itemprop="name">模型模拟</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>19k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>17 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="/images/wrf/wrf_logo.jpg" alt="Weather Research and Forcast Model"></p>
+<h1 id="1-Install-“GNU-Tools”-and-“gfortran”"><a href="#1-Install-“GNU-Tools”-and-“gfortran”" class="headerlink" title="1. Install “GNU Tools” and “gfortran”"></a>1. Install “GNU Tools” and “gfortran”</h1><p>=========================================================<br>dnf -y install gcc<br>dnf -y install cpp gcc-c++<br>dnf -y install gcc-gfortran<br>dnf -y install unzip bzip2 time nfs-utils perl tcsh wget git m4 mlocate.x86_64 libX11-devel.x86_64 libXext-devel.x86_64 libXrender-devel.x86_64 fontconfig-devel.x86_64 curl-devel cmake cairo-devel pixman-devel bzip2-devel byacc flex libXmu-devel libXt-devel libXaw libXaw-devel  </p>
+<p>=========================================================  </p>
+<a id="more"></a>
+
+<h1 id="2-Directory-Structure"><a href="#2-Directory-Structure" class="headerlink" title="2. Directory Structure"></a>2. Directory Structure</h1><h2 id="2-1-Directory"><a href="#2-1-Directory" class="headerlink" title="2.1 Directory:"></a>2.1 Directory:</h2><p>=========================================================<br>Build_WRF       (Main Directory)<br>|–LIBRARIES    (Library Directory)<br>|–geos         (Geography Data and mount to /data/geos)<br>|–DATA         (Directory for Real-time Data)<br>|–src          (Directory for Source Code)  </p>
+<p><strong>Notes</strong>:  </p>
+<blockquote>
+<ol>
+<li>You can create folder(“Build_WRF”) wherever you want as long as you are authorized.  </li>
+<li>In this tutotial, the folder(“Build_WRF”) was build in /root/.  </li>
+</ol>
+</blockquote>
+<p>=========================================================</p>
+<h2 id="2-2-tests"><a href="#2-2-tests" class="headerlink" title="2.2 tests:"></a>2.2 tests:</h2><p>=========================================================<br>Make a new Directory as “tests” and download “Fortran_C_tests.tar” into it.<br>Follow the online tutotial to finish it.(<a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php">https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php</a>)  </p>
+<p>cd /root/Build_WRF/src<br>mkdir TESTS<br>cd TESTS<br>wget <a target="_blank" rel="noopener" href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/Fortran_C_tests.tar">http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/Fortran_C_tests.tar</a> –no-check-certificate<br>tar -xf Fortran_C_tests.tar  </p>
+<h3 id="Test-1-Fixed-Format-Fortran-Test-TEST-1-fortran-only-fixed-f"><a href="#Test-1-Fixed-Format-Fortran-Test-TEST-1-fortran-only-fixed-f" class="headerlink" title="Test #1: Fixed Format Fortran Test: TEST_1_fortran_only_fixed.f"></a>Test #1: Fixed Format Fortran Test: TEST_1_fortran_only_fixed.f</h3><blockquote>
+<p>  gfortran TEST_1_fortran_only_fixed.f<br>  ./a.out  </p>
+</blockquote>
+<p>The following should print out to the screen:  </p>
+<blockquote>
+<p>  SUCCESS test 1 fortran only fixed format  </p>
+</blockquote>
+<h3 id="Test-2-Free-Format-Fortran-TEST-2-fortran-only-free-f90"><a href="#Test-2-Free-Format-Fortran-TEST-2-fortran-only-free-f90" class="headerlink" title="Test #2: Free Format Fortran: TEST_2_fortran_only_free.f90"></a>Test #2: Free Format Fortran: TEST_2_fortran_only_free.f90</h3><blockquote>
+<p>  gfortran TEST_2_fortran_only_free.f90<br>  ./a.out  </p>
+</blockquote>
+<p>The following should print out to the screen:  </p>
+<blockquote>
+<p>  Assume Fortran 2003: has FLUSH, ALLOCATABLE, derived type, and ISO C Binding<br>  SUCCESS test 2 fortran only free format  </p>
+</blockquote>
+<h3 id="Test-3-C-TEST-3-c-only-c"><a href="#Test-3-C-TEST-3-c-only-c" class="headerlink" title="Test #3: C: TEST_3_c_only.c"></a>Test #3: C: TEST_3_c_only.c</h3><blockquote>
+<p>  gcc TEST_3_c_only.c<br>  ./a.out  </p>
+</blockquote>
+<p>The following should print out to the screen:  </p>
+<blockquote>
+<p>  SUCCESS test 3 c only  </p>
+</blockquote>
+<h3 id="Test-4-Fortran-Calling-a-C-Function-our-gcc-and-gfortran-have-different-defaults-so-we-force-both-to-always-use-64-bit-m64-when-combining-them-TEST-4-fortran-c-c-c-and-TEST-4-fortran-x-f-f90"><a href="#Test-4-Fortran-Calling-a-C-Function-our-gcc-and-gfortran-have-different-defaults-so-we-force-both-to-always-use-64-bit-m64-when-combining-them-TEST-4-fortran-c-c-c-and-TEST-4-fortran-x-f-f90" class="headerlink" title="Test #4: Fortran Calling a C Function (our gcc and gfortran have different defaults, so we force both to always use 64 bit [-m64] when combining them): TEST_4_fortran+c_c.c, and TEST_4_fortran+x_f.f90"></a>Test #4: Fortran Calling a C Function (our gcc and gfortran have different defaults, so we force both to always use 64 bit [-m64] when combining them): TEST_4_fortran+c_c.c, and TEST_4_fortran+x_f.f90</h3><blockquote>
+<p>  gcc -c -m64 TEST_4_fortran+c_c.c<br>  gfortran -c -m64 TEST_4_fortran+c_f.f90<br>  gfortran -m64 TEST_4_fortran+c_f.o TEST_4_fortran+c_c.o<br>  ./a.out  </p>
+</blockquote>
+<p>The following should print out to the screen:  </p>
+<blockquote>
+<p>  C function called by Fortran<br>  Values are xx = 2.00 and ii = 1<br>  SUCCESS test 4 fortran calling c  </p>
+</blockquote>
+<h3 id="Test-5-csh-In-the-command-line-type"><a href="#Test-5-csh-In-the-command-line-type" class="headerlink" title="Test #5: csh In the command line, type:"></a>Test #5: csh In the command line, type:</h3><blockquote>
+<p>  ./TEST_csh.csh  </p>
+</blockquote>
+<p>The result should be:  </p>
+<blockquote>
+<p>  SUCCESS csh test  </p>
+</blockquote>
+<h3 id="Test-6-perl-In-the-command-line-type"><a href="#Test-6-perl-In-the-command-line-type" class="headerlink" title="Test #6: perl In the command line, type:"></a>Test #6: perl In the command line, type:</h3><blockquote>
+<p>  ./TEST_perl.pl  </p>
+</blockquote>
+<p>The result should be:  </p>
+<blockquote>
+<p>  SUCCESS perl test  </p>
+</blockquote>
+<h3 id="Test-7-sh-In-the-command-line-type"><a href="#Test-7-sh-In-the-command-line-type" class="headerlink" title="Test #7: sh In the command line, type:"></a>Test #7: sh In the command line, type:</h3><blockquote>
+<p>  ./TEST_sh.sh  </p>
+</blockquote>
+<p>The result should be:  </p>
+<blockquote>
+<p>  SUCCESS sh test  </p>
+</blockquote>
+<p>=========================================================  </p>
+<h1 id="3-Environments"><a href="#3-Environments" class="headerlink" title="3. Environments"></a>3. Environments</h1><h2 id="3-1-Set-Environments"><a href="#3-1-Set-Environments" class="headerlink" title="3.1 Set Environments"></a>3.1 Set Environments</h2><p>=========================================================<br>###DIR<br>export DIR=/root/Build_WRF/LIBRARIES<br>###MPICH<br>export PATH=${DIR}/mpich/bin:$PATH<br>export LD_LIBRARY_PATH=${DIR}/mpich/lib:$LD_LIBRARY_PATH<br>###HDF5<br>export HDF5=${DIR}/hdf5<br>export PATH=${DIR}/hdf5/bin:$PATH<br>export LD_LIBRARY_PATH=${DIR}/hdf5/lib:$LD_LIBRARY_PATH<br>###NETCDF<br>export PATH=${DIR}/netcdf/bin:$PATH<br>export NETCDF=${DIR}/netcdf<br>export LD_LIBRARY_PATH=${DIR}/netcdf/lib:$LD_LIBRARY_PATH<br>###LIBPNG<br>export LD_LIBRARY_PATH=${DIR}/libpng/lib:$LD_LIBRARY_PATH<br>###JASPER<br>export PATH=${DIR}/jasper/bin:$PATH<br>export LD_LIBRARY_PATH=${DIR}/jasper/lib:$LD_LIBRARY_PATH<br>export JASPERLIB=${DIR}/jasper/lib<br>export JASPERINC=${DIR}/jasper/include<br>###WRF<br>ulimit -s unlimited<br>export MALLOC_CHECK_=0<br>export WRF_EM_CORE=1<br>export WRFIO_NCD_LARGE_FILE_SUPPORT=1<br>###WPS<br>export WRF_DIR=/root/Build_WRF/src/WRF-4.1.2  </p>
+<p><strong>Notes</strong>:  </p>
+<blockquote>
+<ol>
+<li>Variables export above will write to ~/.bash_profile,<br> remember source .bash_profile after modify it.  </li>
+<li>If you do this module, please do not any changes<br> about “.bash_profile” file in moudle 4(“4. Dependencies”).  </li>
+</ol>
+</blockquote>
+<p>=========================================================  </p>
+<h1 id="4-LIBRARIES"><a href="#4-LIBRARIES" class="headerlink" title="4. LIBRARIES"></a>4. LIBRARIES</h1><p>=========================================================<br>cd /root/Build_WRF/src  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  To locate to “/root/Build_WRF/LIBRARIES” faster, we export<br>++  a variable as “DIR”:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### DIR<br>++    export DIR=/root/Build_WRF/LIBRARIES<br>++——————————————-<br>++  Update PATH variable.<br>++   source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<h2 id="4-1-MPI"><a href="#4-1-MPI" class="headerlink" title="4.1 MPI"></a>4.1 MPI</h2><p>=========================================================<br>wget <a target="_blank" rel="noopener" href="https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz">https://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz</a><br>tar -xzf mpich-3.3<br>cd mpich-3.3<br>./configure –prefix=${DIR}/mpich<br>make -j2<br>make install<br>cd ..  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### MPICH<br>++    export PATH=${DIR}/mpich/bin:$PATH<br>++    export LD_LIBRARY_PATH=${DIR}/mpich/lib:$LD_LIBRARY_PATH<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================</p>
+<h2 id="4-2-ZLIB"><a href="#4-2-ZLIB" class="headerlink" title="4.2 ZLIB"></a>4.2 ZLIB</h2><p>=========================================================<br>wget <a target="_blank" rel="noopener" href="https://zlib.net/zlib-1.2.11.tar.gz">https://zlib.net/zlib-1.2.11.tar.gz</a><br>tar -xzf zlib-1.2.11.tar.gz<br>cd zlib-1.2.11<br>./configure –prefix=${DIR}/zlib<br>make -j2<br>make install<br>cd ..  </p>
+<p>=========================================================  </p>
+<h2 id="4-3-HDF5"><a href="#4-3-HDF5" class="headerlink" title="4.3 HDF5"></a>4.3 HDF5</h2><p>=========================================================<br>wget <a target="_blank" rel="noopener" href="https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz">https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz</a><br>tar xzf hdf5-1.10.5.tar.gz<br>cd hdf5-1.10.5<br>CC=gcc<br>FC=gfortran<br>CXX=g++<br>./configure –with-zlib=${DIR}/zlib –prefix=${DIR}/hdf5 –enable-fortran –enable-fortran2003 –enable-cxx<br>make -j2<br>make install<br>cd ..  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### HDF5<br>++    export HDF5=${DIR}/hdf5<br>++    export PATH=${DIR}/hdf5/bin:$PATH<br>++    export LD_LIBRARY_PATH=${DIR}/hdf5/lib:$LD_LIBRARY_PATH<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<h2 id="4-4-PnetCDF"><a href="#4-4-PnetCDF" class="headerlink" title="4.4 PnetCDF"></a>4.4 PnetCDF</h2><p>=========================================================  </p>
+<p>=========================================================  </p>
+<h2 id="4-5-NetCDF-C"><a href="#4-5-NetCDF-C" class="headerlink" title="4.5 NetCDF-C"></a>4.5 NetCDF-C</h2><p>=========================================================<br>export CC=gcc<br>export CFLAGS=”-fPIC”<br>export CPP=cpp<br>export CPPFLAGS=”-I${DIR}/hdf5/include”<br>export LDFLAGS=”-L${DIR}/hdf5/lib”<br>wget <a href="ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-c-4.7.0.tar.gz">ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-c-4.7.0.tar.gz</a><br>tar xzf netcdf-c-4.7.0.tar.gz<br>cd netcdf-c-4.7.0<br>./configure –prefix=${DIR}/netcdf<br>make -j2<br>make install<br>cd ..  </p>
+<p>=========================================================  </p>
+<h2 id="4-6-NetCDF-Fortran"><a href="#4-6-NetCDF-Fortran" class="headerlink" title="4.6 NetCDF-Fortran"></a>4.6 NetCDF-Fortran</h2><p>=========================================================<br>export LD_LIBRARY_PATH=${NCDIR}/lib:${LD_LIBRARY_PATH}<br>wget <a href="ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-fortran-4.4.5.tar.gz">ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-fortran-4.4.5.tar.gz</a><br>tar xzf netcdf-fortran-4.4.5.tar.gz<br>cd netcdf-fortran-4.4.5<br>export CC=gcc<br>export F77=gfortran<br>export FC=gfortran<br>export FCFLAGS=”-m64”<br>export CPP=cpp<br>export CPPFLAGS=”-I${DIR}/netcdf/include”<br>export LDFLAGS=”-L${DIR}/netcdf/lib”<br>./configure –prefix=${DIR}/netcdf<br>make -j2<br>make install<br>cd ..  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### NETCDF<br>++    export PATH=${DIR}/netcdf/bin:$PATH<br>++    export NETCDF=${DIR}/netcdf<br>++    export LD_LIBRARY_PATH=${DIR}/netcdf/lib:$LD_LIBRARY_PATH<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p><strong>Notes</strong>:<br>    Chect whether the file(“netcdf.inc”) exists， do &gt;1. or &gt;2.:  </p>
+<blockquote>
+<ol>
+<li>   find / -name netcdf.inc     </li>
+</ol>
+</blockquote>
+<pre><code>the terminal will show the find information of netcdf.inc, like below:  
+[root@localhost netcdf-fortran-4.4.5]# find / -name netcdf.inc  
+/root/Build_WRF/src/netcdf-fortran-4.4.5/fortran/netcdf.inc  
+/root/Build_WRF/LIBRARIES/netcdf/include/netcdf.inc  
+
+If you see &quot;/root/Build_WRF/LIBRARIES/netcdf/include/netcdf.inc&quot;,  
+this mean &quot;netcdf.inc&quot; has been successfully generated, go to the  
+next install module.  
+Else, do 4.6 install module again(begain at &quot;export CC=gcc&quot;).  </code></pre>
+<blockquote>
+<ol start="2">
+<li>   ls $DIR/netcdf/include/  </li>
+</ol>
+</blockquote>
+<pre><code>the terminal will show the find information of netcdf.inc, like below:  
+[root@localhost netcdf-fortran-4.4.5]# ls $DIR/netcdf/include/  
+netcdf_aux.h     netcdf.h      netcdf_meta.h       netcdf_nc_interfaces.mod  typesizes.mod  
+netcdf_f03.mod   netcdf.inc    netcdf.mod          netcdf_nf_data.mod  
+netcdf_filter.h  netcdf_mem.h  netcdf_nc_data.mod  netcdf_nf_interfaces.mod  
+
+If you see &quot;netcdf.inc&quot;, this mean &quot;netcdf.inc&quot; has been successfully  
+generated, go to the next install module. 
+Else, do 4.6 install module again(begain at &quot;export CC=gcc&quot;).  </code></pre>
+<p>=========================================================  </p>
+<h2 id="4-7-LIBPNG"><a href="#4-7-LIBPNG" class="headerlink" title="4.7 LIBPNG"></a>4.7 LIBPNG</h2><p>=========================================================<br>wget <a href="ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.37.tar.gz">ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/libpng-1.6.37.tar.gz</a><br>tar xzf libpng-1.6.37.tar.gz<br>cd libpng-1.6.37/<br>export CC=gcc<br>export F77=gfortran<br>export FC=gfortran<br>export FCFLAGS=”-m64”<br>export CPP=cpp<br>export CPPFLAGS=”-I${DIR}/netcdf/include”<br>export LDFLAGS=”-L${DIR}/netcdf/lib”<br>./configure –prefix=${DIR}/libpng<br>make -j2<br>make install<br>cd ..  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### libpng<br>++    export LD_LIBRARY_PATH=${DIR}/libpng/lib:$LD_LIBRARY_PATH<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<h2 id="4-8-JASPER"><a href="#4-8-JASPER" class="headerlink" title="4.8 JASPER"></a>4.8 JASPER</h2><p>=========================================================<br>wget <a target="_blank" rel="noopener" href="https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.19.tar.gz">https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.19.tar.gz</a><br>tar xzf jasper-1.900.19.tar.gz<br>cd jasper-1.900.19<br>./configure –prefix=${DIR}/jasper<br>make -j2<br>make install<br>cd ..  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### jasper<br>++    export PATH=${DIR}/jasper/bin:$PATH<br>++    export LD_LIBRARY_PATH=${DIR}/jasper/lib:$LD_LIBRARY_PATH<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<h2 id="4-9-tests"><a href="#4-9-tests" class="headerlink" title="4.9 tests"></a>4.9 tests</h2><p>=========================================================<br>Download this tar file and place it in the TESTS directory,<br>and then “cd” into the TESTS directory:  </p>
+<p>wget <a target="_blank" rel="noopener" href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/Fortran_C_NETCDF_MPI_tests.tar">http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/Fortran_C_NETCDF_MPI_tests.tar</a> –no-check-certificate<br>tar -xf Fortran_C_NETCDF_MPI_tests.tar  </p>
+<h3 id="Test-1-Fortran-C-NetCDF"><a href="#Test-1-Fortran-C-NetCDF" class="headerlink" title="Test #1: Fortran + C + NetCDF"></a>Test #1: Fortran + C + NetCDF</h3><blockquote>
+<p>  cp ${DIR}/netcdf/include/netcdf.inc .<br>  gfortran -c 01_fortran+c+netcdf_f.f<br>  gcc -c 01_fortran+c+netcdf_c.c<br>  gfortran 01_fortran+c+netcdf_f.o 01_fortran+c+netcdf_c.o \<br>      -L${NETCDF}/lib -lnetcdff -lnetcdf<br>  ./a.out  </p>
+</blockquote>
+<p>The following should be displayed on your screen:  </p>
+<blockquote>
+<p>  C function called by Fortran<br>  Values are xx = 2.00 and ii = 1<br>  SUCCESS test 1 fortran + c + netcdf  </p>
+</blockquote>
+<h3 id="Test-2-Fortran-C-NetCDF-MPI"><a href="#Test-2-Fortran-C-NetCDF-MPI" class="headerlink" title="Test #2: Fortran + C + NetCDF + MPI"></a>Test #2: Fortran + C + NetCDF + MPI</h3><blockquote>
+<p>  cp ${NETCDF}/include/netcdf.inc .<br>   mpif90 -c 02_fortran+c+netcdf+mpi_f.f<br>  mpicc -c 02_fortran+c+netcdf+mpi_c.c<br>  mpif90 02_fortran+c+netcdf+mpi_f.o \<br>  02_fortran+c+netcdf+mpi_c.o \<br>      -L${NETCDF}/lib -lnetcdff -lnetcdf<br>  mpirun ./a.out  </p>
+</blockquote>
+<p>The following should be displayed on your screen:  </p>
+<blockquote>
+<p>  C function called by Fortran<br>  Values are xx = 2.00 and ii = 1<br>  status = 2<br>  SUCCESS test 2 fortran + c + netcdf + mpi  </p>
+</blockquote>
+<p>=========================================================  </p>
+<h1 id="5-Buinding-WRF"><a href="#5-Buinding-WRF" class="headerlink" title="5. Buinding WRF"></a>5. Buinding WRF</h1><p>=========================================================<br>wget <a target="_blank" rel="noopener" href="https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz">https://github.com/wrf-model/WRF/archive/v4.1.2.tar.gz</a><br>mv v4.1.2.tar.gz WRFv4.1.2.tar.gz  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  ### Parameters of building WRF.<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### WRF<br>++    ulimit -s unlimited<br>++    export MALLOC_CHECK_=0<br>++    export WRF_EM_CORE=1<br>++    export WRFIO_NCD_LARGE_FILE_SUPPORT=1<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>tar -xzf WRFv4.1.2.tar.gz<br>cd WRF-4.1.2/  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  ### Edit the default config to eneable Jasper.<br>++  It’s a option, not required. As below:<br>++    nano arch/Config.pl<br>++——————————————-<br>++    I_really_want_to_output_grib2_from_WRF = “TRUE” ;<br>++——————————————-<br>++  Notes: “JASPERLIB” and “JASPERINC” must be set in<br>++  ~/.bash_profile.<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    export JASPERLIB=${DIR}/jasper/lib<br>++    export JASPERINC=${DIR}/jasper/include<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>./configure  </p>
+<blockquote>
+<blockquote>
+<p>34<br>1  </p>
+</blockquote>
+</blockquote>
+<p>./compile em_real &gt;&amp; log.compile &amp;<br>tail -f log.compile<br>ls -lah main/*.exe  </p>
+<p>If you see real.exe and wrf.exe then correct.<br>Else check Error in log.compile file.  </p>
+<p>cd ..  </p>
+<p>=========================================================  </p>
+<h1 id="6-Buinding-WPS"><a href="#6-Buinding-WPS" class="headerlink" title="6. Buinding WPS"></a>6. Buinding WPS</h1><p>=========================================================<br>wget <a target="_blank" rel="noopener" href="https://github.com/wrf-model/WPS/archive/v4.1.tar.gz">https://github.com/wrf-model/WPS/archive/v4.1.tar.gz</a><br>tar xvzf v4.1.tar.gz<br>cd WPS-4.1  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  ### Setting the directory of WRF installed. Not required,<br>++  setting it if you modify the name or location of WRF install by default.<br>++  Create PATH variable in file .bash_profile:<br>++    nano ~/.bash_profile<br>++——————————————-<br>++    ### WPS<br>++    export WRF_DIR=/root/Build_WRF/src/WRF-4.1.2<br>++——————————————-<br>++  Update PATH variable.<br>++    source ~/.bash_profile<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>./configure  </p>
+<blockquote>
+<blockquote>
+<p>3  </p>
+</blockquote>
+</blockquote>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  ### edit configure.wps file.<br>++  Change DM_FC to mpif90 and Append -lgomp in WRF_LIB.<br>++    nano configure.wps<br>++——————————————-<br>++    DM_FC = mpif90<br>++    WRF_LIB = -L$(WRF_DIR)/external/io_grib1 -lio_grib1 \<br>++              -L$(WRF_DIR)/external/io_grib_share -lio_grib_share \<br>++              -L$(WRF_DIR)/external/io_int -lwrfio_int \<br>++              -L$(WRF_DIR)/external/io_netcdf -lwrfio_nf \<br>++              -L$(NETCDF)/lib -lnetcdff -lnetcdf -lgomp<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>./compile &gt;&amp; log.compile &amp;<br>tail -f log.compile<br>ls -lah *.exe  </p>
+<p>If you see geogrid.exe metgrid.exe and ungrib.exe then correct.<br>Else check Error in log.compile file.  </p>
+<p>cd ..  </p>
+<p>=========================================================  </p>
+<h1 id="7-Run-a-Case"><a href="#7-Run-a-Case" class="headerlink" title="7. Run a Case"></a>7. Run a Case</h1><p>=========================================================<br><strong>Notes</strong>:<br>This case referenfe from “<a target="_blank" rel="noopener" href="https://drive.google.com/file/d/1RaXuWig4WM4VflD9rHolA_5MuWmiEzBn/view">How to Install WRF Model On CentOS Version 7</a>“.      </p>
+<h2 id="7-1-Create-Directory-for-Geography-Data"><a href="#7-1-Create-Directory-for-Geography-Data" class="headerlink" title="7.1 Create Directory for Geography Data."></a>7.1 Create Directory for Geography Data.</h2><p>=========================================================<br>cd /root/Build_WRF/<br>wget <a target="_blank" rel="noopener" href="http://www2.mmm.ucar.edu/wrf/src/wps_files/geog_complete.tar.bz2">http://www2.mmm.ucar.edu/wrf/src/wps_files/geog_complete.tar.bz2</a><br>tar -xvjf geog_complete.tar.bz2</p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  If above link is invaild, do as below:<br>++——————————————-<br>++    wget <a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_complete.tar.gz">https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_complete.tar.gz</a><br>++    wget <a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/src/wps_files/albedo_modis.tar.bz2">https://www2.mmm.ucar.edu/wrf/src/wps_files/albedo_modis.tar.bz2</a><br>++    wget <a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/src/wps_files/maxsnowalb_modis.tar.bz2">https://www2.mmm.ucar.edu/wrf/src/wps_files/maxsnowalb_modis.tar.bz2</a><br>++    tar -xzf geog_complete.tar.gz<br>++    tar -xjf albedo_modis.tar.bz2<br>++    tar -xjf maxsnowalb_modis.tar.bz2<br>++    mv albedo_modis geog/<br>++    mv maxsnowalb_modis geog/<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================</p>
+<h2 id="7-2-Create-directory-for-Real-time-Data"><a href="#7-2-Create-directory-for-Real-time-Data" class="headerlink" title="7.2 Create directory for Real-time Data."></a>7.2 Create directory for Real-time Data.</h2><p>=========================================================<br>mkdir -p /root/Build_WRF/DATA<br>cd /root/Build_WRF/DATA<br>wget <a target="_blank" rel="noopener" href="http://hydro.haii.or.th/tmp/WRF/gfs.t00z.pgrb2.0p50.f000">http://hydro.haii.or.th/tmp/WRF/gfs.t00z.pgrb2.0p50.f000</a><br>wget <a target="_blank" rel="noopener" href="http://hydro.haii.or.th/tmp/WRF/gfs.t00z.pgrb2.0p50.f006">http://hydro.haii.or.th/tmp/WRF/gfs.t00z.pgrb2.0p50.f006</a>  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++   Or update Real-time from web site <a href="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/">ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/</a><br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<h2 id="7-3-Running-WPS"><a href="#7-3-Running-WPS" class="headerlink" title="7.3 Running WPS."></a>7.3 Running WPS.</h2><p>=========================================================<br>cd /root/Build_WRF/WPS-4.1<br>rm namelist.wps<br>wget <a target="_blank" rel="noopener" href="http://hydro.haii.or.th/tmp/WRF/namelist.wps">http://hydro.haii.or.th/tmp/WRF/namelist.wps</a>  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  ### Edit namelist.wps section max_dom, start_date, end_date<br>++  ### same Real-time Data and set geog_data_path to Geography Data.<br>++<br>++      nano namelist.wps<br>++——————————————-<br>++      &amp;share<br>++       max_dom = 1,<br>++       start_date = ‘2017-05-17_00:00:00’,’2006-08-16_12:00:00’,<br>++       end_date = ‘2017-05-17_06:00:00’,’2006-08-16_12:00:00’,<br>++<br>++      geog_data_path = ‘/root/Build_WRF/geog/‘<br>++——————————————-<br>++    Pay attention to the first colmun of start_date、end_date.<br>++    Because max_dom is 1.<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<h3 id="7-3-1-Create-Geography-Data"><a href="#7-3-1-Create-Geography-Data" class="headerlink" title="7.3.1 Create Geography Data."></a>7.3.1 Create Geography Data.</h3><p>./geogrid.exe<br>ls -lah geo_em.d01.nc  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see <strong>geo_em.d01.nc</strong> is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<h3 id="7-3-2-Link-Real-time-Data-top-WPS"><a href="#7-3-2-Link-Real-time-Data-top-WPS" class="headerlink" title="7.3.2 Link Real-time Data top WPS."></a>7.3.2 Link Real-time Data top WPS.</h3><p>./link_grib.csh /root/Build_WRF/DATA/gfs.t00z.pgrb2.0p50.f0*  </p>
+<h3 id="7-3-3-Link-Vtable"><a href="#7-3-3-Link-Vtable" class="headerlink" title="7.3.3 Link Vtable."></a>7.3.3 Link Vtable.</h3><p>ln -sf ungrib/Variable_Tables/Vtable.GFS Vtable  </p>
+<h3 id="7-3-4-Create-grib-file"><a href="#7-3-4-Create-grib-file" class="headerlink" title="7.3.4 Create grib file."></a>7.3.4 Create grib file.</h3><p>./ungrib.exe<br>ls -lah FILE*  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see FILE* is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<h3 id="7-3-5-Create-met-file"><a href="#7-3-5-Create-met-file" class="headerlink" title="7.3.5 Create met file."></a>7.3.5 Create met file.</h3><p>./metgrid.exe<br>ls -lah met_em.*  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see met_em.* is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<h2 id="7-4-Running-WRF"><a href="#7-4-Running-WRF" class="headerlink" title="7.4 Running WRF."></a>7.4 Running WRF.</h2><p>=========================================================<br>cd /root/Build_WRF/WRFV3/test/em_real/</p>
+<h3 id="7-4-1-Link-met-file-from-WPS-to-WRF"><a href="#7-4-1-Link-met-file-from-WPS-to-WRF" class="headerlink" title="7.4.1 Link met file from WPS to WRF."></a>7.4.1 Link met file from WPS to WRF.</h3><p>ln -sf /root/Build_WRF/WPS/met_em* .  </p>
+<h3 id="7-4-2-Edit-namelist-input"><a href="#7-4-2-Edit-namelist-input" class="headerlink" title="7.4.2 Edit namelist.input."></a>7.4.2 Edit namelist.input.</h3><p>rm namelist.input<br>wget <a target="_blank" rel="noopener" href="http://hydro.haii.or.th/tmp/WRF/namelist.input">http://hydro.haii.or.th/tmp/WRF/namelist.input</a>  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++  ### Edit namelist.input in section run_hours, start_year,<br>++  ### start_month, start_day, start_hour, end_year, end_month,<br>++  ### end_day, end_hour and num_metgrid_levels.<br>++  ### nano namelist.input<br>++——————————————-<br>++      &amp;time_control<br>++       run_days = 0,<br>++       run_hours = 6,<br>++       run_minutes = 0,<br>++       run_seconds = 0,<br>++       start_year = 2017, 2000, 2000,<br>++       start_month = 05, 01, 01,<br>++       start_day = 17, 24, 24,<br>++       start_hour = 00, 12, 12,<br>++       start_minute = 00, 00, 00,<br>++       start_second = 00, 00, 00,<br>++       end_year = 2017, 2000, 2000,<br>++       end_month = 05, 01, 01,<br>++       end_day = 17, 25, 25,<br>++       end_hour = 06, 12, 12,<br>++       end_minute = 00, 00, 00,<br>++       end_second = 00, 00, 00,<br>++       interval_seconds = 10800<br>++      &amp;domains<br>++       time_step = 150,<br>++       time_step_fract_num = 0,<br>++       time_step_fract_den = 1,<br>++       max_dom = 1,<br>++       e_we = 74, 112, 94,<br>++       e_sn = 61, 97, 91,<br>++       e_vert = 30, 30, 30,<br>++       p_top_requested = 5000,<br>++       num_metgrid_levels = 32,<br>++——————————————-<br>++    Because max_dom is 1.<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<h3 id="7-4-3-Create-real-case"><a href="#7-4-3-Create-real-case" class="headerlink" title="7.4.3 Create real case."></a>7.4.3 Create real case.</h3><p>mpirun -np 1 ./real.exe  </p>
+<p>tail rsl.error.0000<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see real_em: “SUCCESS COMPLETE REAL_EM INIT” is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>ls -alh wrfbdy_d01 wrfinput_d01<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see wrfbdy_d01 and wrfinput_d01 is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<h3 id="7-4-4-Run-WRF"><a href="#7-4-4-Run-WRF" class="headerlink" title="7.4.4 Run WRF."></a>7.4.4 Run WRF.</h3><p>mpirun -np 4 ./wrf.exe  </p>
+<p>tail rsl.error.0000<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see wrf: “SUCCESS COMPLETE WRF” is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>ls -alh wrfout_*  </p>
+<p>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++<br>++<br>++——————————————-<br>++  ### If you see wrfout_* is coreect.<br>++——————————————-<br>++<br>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  </p>
+<p>=========================================================  </p>
+<p>=========================================================  </p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/OnLineTutorial/">WRF-ARW OnLine Tutorial</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=7Y1QEJpaVD0&t=18s">How to Install WRF-Chem Model Version 4.1.2 and KPP On CentOS Version 7. (2019)</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php">How to Compile WRF: The Complete Process</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html">Getting and Building netCDF</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=73Ix9B6MtWY&t=4s">How to Install WRF-Chem On CentOS version 7. (2020)</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=GlU-EtKAW90">Install WRF4 by Intel compiler On CentOS7.(2020)</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=sTtLgzWh-yg&t=16s">How to Install WRF (part 1/2)(2018)</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=i3QF-DxXBcg&t=81s">How to Install WRF (part 2/2)(2018)</a></li>
+<li><a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/users/">WRF Model | Users Site</a>  </li>
+<li><a target="_blank" rel="noopener" href="https://www.youtube.com/channel/UCqlGJ4CY6c863uVJ0URweKg/videos">MeteoAdriatic YouTube</a></li>
+</ul>
+<h1 id="Useful-Libraries"><a href="#Useful-Libraries" class="headerlink" title="Useful Libraries:"></a>Useful Libraries:</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://www2.mmm.ucar.edu/wrf/src/">www2.mmm.ucar.edu</a></li>
+<li><a target="_blank" rel="noopener" href="https://support.hdfgroup.org/ftp/HDF5/releases/">HDF5</a></li>
+<li><a target="_blank" rel="noopener" href="https://curl.haxx.se/download/">Curl</a></li>
+<li><a target="_blank" rel="noopener" href="https://sourceforge.net/projects/libpng/files/">libpng</a></li>
+<li><a target="_blank" rel="noopener" href="https://parallel-netcdf.github.io/wiki/Download.html">PnetCDF</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ece.uvic.ca/~frodo/jasper/">Jasper</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Unidata/netcdf-c/releases">Netcdf-C</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/Unidata/netcdf-fortran/releases">Netcdf-Fortran</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/wrf-model/WRF/releases">WRF</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/wrf-model/WPS/releases">WPS</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Levin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://levin000.github.io/2020/Compile_Install_WRF4.1.2_On_Centos8.2/" title="Compile &amp; Install WRF4.1.2 On CentOS 8.2">http://levin000.github.io/2020/Compile_Install_WRF4.1.2_On_Centos8.2/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E6%A8%A1%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 模式</a>
+              <a href="/tags/region-climate-model/" rel="tag"><i class="fa fa-tag"></i> region climate model</a>
+              <a href="/tags/Linux/" rel="tag"><i class="fa fa-tag"></i> Linux</a>
+              <a href="/tags/CentOS/" rel="tag"><i class="fa fa-tag"></i> CentOS</a>
+              <a href="/tags/Weather-Research-and-Forcast-Model/" rel="tag"><i class="fa fa-tag"></i> Weather Research and Forcast Model</a>
+              <a href="/tags/WRF/" rel="tag"><i class="fa fa-tag"></i> WRF</a>
+              <a href="/tags/gfortran/" rel="tag"><i class="fa fa-tag"></i> gfortran</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/%E9%87%8E%E5%A4%96%E8%B0%83%E7%A0%94%E4%BB%BB%E5%8A%A1%E4%B9%8B-%E5%BC%A0%E5%8C%97%E6%A0%91%E8%8A%AF%E9%87%87%E9%9B%86%E4%BB%BB%E5%8A%A1/" rel="prev" title="张北树芯采集任务">
+      <i class="fa fa-chevron-left"></i> 张北树芯采集任务
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Install-%E2%80%9CGNU-Tools%E2%80%9D-and-%E2%80%9Cgfortran%E2%80%9D"><span class="nav-number">1.</span> <span class="nav-text">1. Install “GNU Tools” and “gfortran”</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Directory-Structure"><span class="nav-number">2.</span> <span class="nav-text">2. Directory Structure</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-Directory"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Directory:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-tests"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 tests:</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-1-Fixed-Format-Fortran-Test-TEST-1-fortran-only-fixed-f"><span class="nav-number">2.2.1.</span> <span class="nav-text">Test #1: Fixed Format Fortran Test: TEST_1_fortran_only_fixed.f</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-2-Free-Format-Fortran-TEST-2-fortran-only-free-f90"><span class="nav-number">2.2.2.</span> <span class="nav-text">Test #2: Free Format Fortran: TEST_2_fortran_only_free.f90</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-3-C-TEST-3-c-only-c"><span class="nav-number">2.2.3.</span> <span class="nav-text">Test #3: C: TEST_3_c_only.c</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-4-Fortran-Calling-a-C-Function-our-gcc-and-gfortran-have-different-defaults-so-we-force-both-to-always-use-64-bit-m64-when-combining-them-TEST-4-fortran-c-c-c-and-TEST-4-fortran-x-f-f90"><span class="nav-number">2.2.4.</span> <span class="nav-text">Test #4: Fortran Calling a C Function (our gcc and gfortran have different defaults, so we force both to always use 64 bit [-m64] when combining them): TEST_4_fortran+c_c.c, and TEST_4_fortran+x_f.f90</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-5-csh-In-the-command-line-type"><span class="nav-number">2.2.5.</span> <span class="nav-text">Test #5: csh In the command line, type:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-6-perl-In-the-command-line-type"><span class="nav-number">2.2.6.</span> <span class="nav-text">Test #6: perl In the command line, type:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-7-sh-In-the-command-line-type"><span class="nav-number">2.2.7.</span> <span class="nav-text">Test #7: sh In the command line, type:</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Environments"><span class="nav-number">3.</span> <span class="nav-text">3. Environments</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-Set-Environments"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 Set Environments</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-LIBRARIES"><span class="nav-number">4.</span> <span class="nav-text">4. LIBRARIES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-MPI"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 MPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-ZLIB"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 ZLIB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-HDF5"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 HDF5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-PnetCDF"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 PnetCDF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-NetCDF-C"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 NetCDF-C</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-NetCDF-Fortran"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 NetCDF-Fortran</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-7-LIBPNG"><span class="nav-number">4.7.</span> <span class="nav-text">4.7 LIBPNG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-8-JASPER"><span class="nav-number">4.8.</span> <span class="nav-text">4.8 JASPER</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-9-tests"><span class="nav-number">4.9.</span> <span class="nav-text">4.9 tests</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-1-Fortran-C-NetCDF"><span class="nav-number">4.9.1.</span> <span class="nav-text">Test #1: Fortran + C + NetCDF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Test-2-Fortran-C-NetCDF-MPI"><span class="nav-number">4.9.2.</span> <span class="nav-text">Test #2: Fortran + C + NetCDF + MPI</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Buinding-WRF"><span class="nav-number">5.</span> <span class="nav-text">5. Buinding WRF</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-Buinding-WPS"><span class="nav-number">6.</span> <span class="nav-text">6. Buinding WPS</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Run-a-Case"><span class="nav-number">7.</span> <span class="nav-text">7. Run a Case</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-Create-Directory-for-Geography-Data"><span class="nav-number">7.1.</span> <span class="nav-text">7.1 Create Directory for Geography Data.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-2-Create-directory-for-Real-time-Data"><span class="nav-number">7.2.</span> <span class="nav-text">7.2 Create directory for Real-time Data.</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-3-Running-WPS"><span class="nav-number">7.3.</span> <span class="nav-text">7.3 Running WPS.</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-1-Create-Geography-Data"><span class="nav-number">7.3.1.</span> <span class="nav-text">7.3.1 Create Geography Data.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-2-Link-Real-time-Data-top-WPS"><span class="nav-number">7.3.2.</span> <span class="nav-text">7.3.2 Link Real-time Data top WPS.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-3-Link-Vtable"><span class="nav-number">7.3.3.</span> <span class="nav-text">7.3.3 Link Vtable.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-4-Create-grib-file"><span class="nav-number">7.3.4.</span> <span class="nav-text">7.3.4 Create grib file.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-5-Create-met-file"><span class="nav-number">7.3.5.</span> <span class="nav-text">7.3.5 Create met file.</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-4-Running-WRF"><span class="nav-number">7.4.</span> <span class="nav-text">7.4 Running WRF.</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-1-Link-met-file-from-WPS-to-WRF"><span class="nav-number">7.4.1.</span> <span class="nav-text">7.4.1 Link met file from WPS to WRF.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-2-Edit-namelist-input"><span class="nav-number">7.4.2.</span> <span class="nav-text">7.4.2 Edit namelist.input.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-3-Create-real-case"><span class="nav-number">7.4.3.</span> <span class="nav-text">7.4.3 Create real case.</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-4-4-Run-WRF"><span class="nav-number">7.4.4.</span> <span class="nav-text">7.4.4 Run WRF.</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">8.</span> <span class="nav-text">Reference:</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Useful-Libraries"><span class="nav-number">9.</span> <span class="nav-text">Useful Libraries:</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Levin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Levin</p>
+  <div class="site-description" itemprop="description">As simple as possible,<br> As complex as needed!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/leibin_w@163.com" title="E-Mail → leibin_w@163.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Levin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">37k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">34 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>

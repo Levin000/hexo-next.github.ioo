@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/Levin-apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/Levin-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/Levin-16x16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"levin000.github.io","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"right","width":249,"display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="这篇文章就是记录我们如何使用python完成网络世界的爬虫任务，本次爬取内容为欧洲中心的哨兵遥感数据。哨兵遥感数据是继Landsat系列后最受欢迎的免费数据源，具有高分辨率、多光谱、精度高的种种“爆款”亮点。关于哨兵遥感数据的更多介绍这里不再复述，详情见Sentinel|Online - ESA，数据下载地址为Copernicus Open Access Hub，可以点击”Open Hub”进入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="哨兵遥感数据爬取Python实现">
+<meta property="og:url" content="http://levin000.github.io/2018/%E5%93%A8%E5%85%B5%E9%81%A5%E6%84%9F%E6%95%B0%E6%8D%AE%E7%88%AC%E5%8F%96/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="这篇文章就是记录我们如何使用python完成网络世界的爬虫任务，本次爬取内容为欧洲中心的哨兵遥感数据。哨兵遥感数据是继Landsat系列后最受欢迎的免费数据源，具有高分辨率、多光谱、精度高的种种“爆款”亮点。关于哨兵遥感数据的更多介绍这里不再复述，详情见Sentinel|Online - ESA，数据下载地址为Copernicus Open Access Hub，可以点击”Open Hub”进入">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://levin000.github.io/images/esa_rs_data_download/esa-sentinel-online.png">
+<meta property="og:image" content="http://levin000.github.io/images/esa_rs_data_download/CopernicusOpenAccessHub_screenshot.png">
+<meta property="og:image" content="http://levin000.github.io/images/esa_rs_data_download/OpenAccessHub_screenshot.png">
+<meta property="og:image" content="http://levin000.github.io/images/esa_rs_data_download/search-result.png">
+<meta property="article:published_time" content="2018-01-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2018-01-07T16:00:00.000Z">
+<meta property="article:author" content="Levin">
+<meta property="article:tag" content="遥感影像">
+<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="numpy">
+<meta property="article:tag" content="bs4">
+<meta property="article:tag" content="BeautifulSoup">
+<meta property="article:tag" content="requests">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://levin000.github.io/images/esa_rs_data_download/esa-sentinel-online.png">
+
+<link rel="canonical" href="http://levin000.github.io/2018/%E5%93%A8%E5%85%B5%E9%81%A5%E6%84%9F%E6%95%B0%E6%8D%AE%E7%88%AC%E5%8F%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>哨兵遥感数据爬取Python实现 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">心无旁骛</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">19</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">4</span></a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://levin000.github.io/2018/%E5%93%A8%E5%85%B5%E9%81%A5%E6%84%9F%E6%95%B0%E6%8D%AE%E7%88%AC%E5%8F%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Levin">
+      <meta itemprop="description" content="As simple as possible,<br> As complex as needed!">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          哨兵遥感数据爬取Python实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-01-07 00:00:00" itemprop="dateCreated datePublished" datetime="2018-01-07T00:00:00+08:00">2018-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-01-08 00:00:00" itemprop="dateModified" datetime="2018-01-08T00:00:00+08:00">2018-01-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%81%A5%E6%84%9F%E5%BD%B1%E5%83%8F/" itemprop="url" rel="index"><span itemprop="name">遥感影像</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>这篇文章就是记录我们如何使用python完成网络世界的爬虫任务，本次爬取内容为欧洲中心的哨兵遥感数据。哨兵遥感数据是继Landsat系列后最受欢迎的免费数据源，具有高分辨率、多光谱、精度高的种种“爆款”亮点。关于哨兵遥感数据的更多介绍这里不再复述，详情见<a target="_blank" rel="noopener" href="https://sentinel.esa.int/web/sentinel/home" title="Sentinel|Online - ESA">Sentinel|Online - ESA</a>，数据下载地址为<a target="_blank" rel="noopener" href="https://scihub.copernicus.eu/">Copernicus Open Access Hub</a>，可以点击”Open Hub”进入数据选择主页! 该网站数据下载需要提前注册账号(很简单，自己注册即可)。</p>
+</blockquote>
+<ul>
+<li>Sentinel Online - ESA Home<br><img src="/images/esa_rs_data_download/esa-sentinel-online.png" alt="Sentinel Online - ESA Home Preview"></li>
+</ul>
+<a id="more"></a>
+
+<ul>
+<li><p>Copernicus Open Access Hub Home<br><img src="/images/esa_rs_data_download/CopernicusOpenAccessHub_screenshot.png" alt=" Copernicus Open Access Hub Home Preview"></p>
+</li>
+<li><p>Open Access Hub Home<br><img src="/images/esa_rs_data_download/OpenAccessHub_screenshot.png" alt="Open Access Hub Home Preview"></p>
+</li>
+</ul>
+<p>本次爬虫是一个简单的例子，主要用到了numpy、re、requests、BeautifulSoup模块。其中numpy主要用于存储爬取来的链接地址，re为python的正则表达式模块、requests为python的网络请求模块，BeautifulSoup是一个网页HTML、XML的解析模块。python3是大势所趋，所以本次采用的是python3.5.2版本(PS假如你采用的是Anaconda，会默认帮你配置python3环境),并且因为工作主要是在windows下进行，所以采用了Anaconda来安装python3，借助Jupyter Notebook来编写python程序。废话不多说，我们进入正题。</p>
+<h1 id="首先是要在python中导入我们需要的模块"><a href="#首先是要在python中导入我们需要的模块" class="headerlink" title="首先是要在python中导入我们需要的模块"></a>首先是要在python中导入我们需要的模块</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup <span class="keyword">as</span> BS</span><br><span class="line"><span class="keyword">from</span> requests.auth <span class="keyword">import</span> HTTPBasicAuth</span><br></pre></td></tr></table></figure>
+
+<h1 id="工欲善其事，必先利其器。接下里我们要构建我们使用的函数"><a href="#工欲善其事，必先利其器。接下里我们要构建我们使用的函数" class="headerlink" title="工欲善其事，必先利其器。接下里我们要构建我们使用的函数"></a>工欲善其事，必先利其器。接下里我们要构建我们使用的函数</h1><h2 id="获取网站respond的函数"><a href="#获取网站respond的函数" class="headerlink" title="获取网站respond的函数"></a>获取网站respond的函数</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getresp</span>(<span class="params">url,params,author</span>):</span></span><br><span class="line">    resp = requests.get(url,params=params,auth=author)</span><br><span class="line">    <span class="keyword">if</span> resp.status_code == requests.codes.ok:</span><br><span class="line">        print(<span class="string">&#x27;Visiting url successful!&#x27;</span>)</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        resp.raise_for_status()</span><br><span class="line">        <span class="comment"># quit()</span></span><br><span class="line">    <span class="keyword">return</span> resp</span><br></pre></td></tr></table></figure>
+
+<h2 id="获取respond中包含的每条数据的链接"><a href="#获取respond中包含的每条数据的链接" class="headerlink" title="获取respond中包含的每条数据的链接"></a>获取respond中包含的每条数据的链接</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">geturl</span>(<span class="params">resp</span>):</span></span><br><span class="line">    fileurl = []</span><br><span class="line">    soup = BS(resp.text,<span class="string">&#x27;lxml&#x27;</span>)</span><br><span class="line">    entrys = soup.findChildren(<span class="string">&#x27;entry&#x27;</span>)</span><br><span class="line">    <span class="keyword">for</span> entry <span class="keyword">in</span> entrys:</span><br><span class="line">        fileurl.append(entry.link.attrs[<span class="string">&#x27;href&#x27;</span>])</span><br><span class="line">    <span class="keyword">return</span> fileurl</span><br></pre></td></tr></table></figure>
+
+<h1 id="接下来时我们爬取数据时需要的用户信息等参数"><a href="#接下来时我们爬取数据时需要的用户信息等参数" class="headerlink" title="接下来时我们爬取数据时需要的用户信息等参数"></a>接下来时我们爬取数据时需要的用户信息等参数</h1><h2 id="填写自己的U-ser-Information"><a href="#填写自己的U-ser-Information" class="headerlink" title="填写自己的U ser Information"></a>填写自己的U ser Information</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user = <span class="string">&#x27;username&#x27;</span>  <span class="comment">#你注册时的用户名</span></span><br><span class="line">password = <span class="string">&#x27;password&#x27;</span>  <span class="comment">#用户名对应的登陆密码</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="根据用户信息构造登陆信息"><a href="#根据用户信息构造登陆信息" class="headerlink" title="根据用户信息构造登陆信息"></a>根据用户信息构造登陆信息</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">author = HTTPBasicAuth(user,password)</span><br></pre></td></tr></table></figure>
+
+<h2 id="网站的url信息，检索参数设定"><a href="#网站的url信息，检索参数设定" class="headerlink" title="网站的url信息，检索参数设定"></a>网站的url信息，检索参数设定</h2><ul>
+<li><p><strong>数据检索url</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url = <span class="string">&#x27;https://scihub.copernicus.eu/dhus/search&#x27;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>检索结果页开始页(start，默认从0开始) and  检索结果每页记录行数(row，最大为100)</strong></p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">start = <span class="number">0</span></span><br><span class="line">rows = <span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>数据检索结果排序参数(search results order)</strong> </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">orderby = <span class="string">&#x27;beginposition desc&#x27;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>参数说明：</strong><br>    <strong>beginposition asc:</strong> sorts results by sensing date arranged in ascending order<br>    <strong>beginposition desc:</strong> sorts results by sensing date arranged in descending order<br>    <strong>ingestiondate asc:</strong> sorts results by ingestion date arranged in ascending order<br>    <strong>ingestiondate desc:</strong> sorts results by ingestion date arranged in descending order </p>
+</blockquote>
+<ul>
+<li><strong>检索数据的时间范围(period)</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">beginposition = <span class="string">&#x27;[2015-09-01T00:00:00.000Z TO 2017-11-14T23:59:59.999Z]&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">endposition = <span class="string">&#x27;[2015-09-01T00:00:00.000Z TO 2017-11-14T23:59:59.999Z]&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>遥感平台的文件名(filename)</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filename = <span class="string">&#x27;S2A_*&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>遥感产品的平台名称(platformname)</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">platformname = <span class="string">&#x27;Sentinel-2&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>遥感产品类型(producttype)</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">producttype = <span class="string">&#x27;S2MSI1C&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>检索的空间范围支持polygon等，详细见下图</strong><br>Search Result<img src="/images/esa_rs_data_download/search-result.png" alt="Search Result">其中包含了下面构建参数的信息，以及polygon、box等空间方式</li>
+</ul>
+<h2 id="根据网站的检索参数构建检索参数表-earch-parameters"><a href="#根据网站的检索参数构建检索参数表-earch-parameters" class="headerlink" title="根据网站的检索参数构建检索参数表(earch parameters)"></a>根据网站的检索参数构建检索参数表(earch parameters)</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">params=&#123;<span class="string">&#x27;q&#x27;</span>: <span class="string">&#x27;footprint:&quot;Intersects(POLYGON((-125.31488630127798 49.37923341676577,-94.1177312732597 49.611074219444475,-89.47742217298237 48.53549820848218,-88.12102412828592 48.53549820848218,-82.12431698331216 45.81890506556195,-81.33903390480367 43.37952244235831,-82.26709572485915 42.332904057015014,-79.41152089391926 42.91073956185417,-79.55429963546625 43.793199048601366,-76.91289291684686 43.84470870363458,-75.05676927673592 45.21866420479017,-71.41591136728756 45.41945598010943,-69.13145150253564 47.86937637130322,-67.27532786242472 47.3399115244641,-66.49004478391625 44.510289298419195,-68.70311527789465 43.99897102421997,-70.4878495472321 42.54364651046643,-70.63062828877908 41.26857486211881,-73.55759249049247 40.35002427915461,-75.5564948721504 37.23493437901901,-75.34232675982992 35.5106407926214,-81.26764453403018 30.91389921859202,-79.55429963546625 26.277507711359192,-80.41097208474821 24.601441451662325,-82.05292761253865 25.699976916085063,-83.40932565723509 29.246069409930726,-86.47906860049548 29.92894696853658,-89.26325406066188 29.92894696853658,-90.76243084690535 29.31312823256077,-93.47522693629823 29.31312823256077,-96.9733061041996 27.428820161771597,-96.9733061041996 25.253804342260892,-99.8288809351395 26.28243160798492,-101.32805772138293 29.188555415633374,-103.32696010304085 28.938955736789637,-104.9689156308313 29.56181780055128,-105.32586248469879 30.242555555774018,-107.5389329786772 31.40731039455048,-108.89533102337366 30.73469982619183,-113.32147201133047 31.58992129699972,-115.17759565144141 32.377092871245935,-117.39066614541981 32.377092871245935,-118.74706419011625 33.93095765190809,-120.6745772010007 34.22660464625842,-122.38792209956462 36.439439833782075,-124.52960322276952 39.97231578245231,-124.67238196431654 43.17562317292362,-124.31543511044906 47.00393239105679,-125.31488630127801 48.58637973178338,-125.31488630127798 49.37923341676577,-125.31488630127798 49.37923341676577)))&quot;&#x27;</span></span><br><span class="line">        + <span class="string">&#x27; AND filename:&#x27;</span>+ filename + <span class="string">&#x27; AND platformname:&#x27;</span> + platformname + <span class="string">&#x27; AND producttype:&#x27;</span> + producttype </span><br><span class="line">        + <span class="string">&#x27; AND beginposition:&#x27;</span> + beginposition + <span class="string">&#x27; AND endPosition:&#x27;</span> + endposition,</span><br><span class="line">        <span class="string">&#x27;orderby&#x27;</span>: orderby,</span><br><span class="line">        <span class="string">&#x27;start&#x27;</span>: start,</span><br><span class="line">        <span class="string">&#x27;rows&#x27;</span>: rows&#125;</span><br></pre></td></tr></table></figure>
+
+<p>准备工作都做好了，接下来该我们进行主要部分了。介于网络爬虫可能出现网络不稳定或着拒接访问的情况，所以我并没有用纯粹的python解释器来做这件事情，而是采用了Jupyter Notebook来爬虫，主要是可以查看错误原因，并且可以及其简单的实现断点重新访问。你可以尝试先在jupyter notebook中理解下面的过程或者你页可以编写一些意外处理方法使得代码更加健壮以在纯python中进行工作。</p>
+<h1 id="main-program"><a href="#main-program" class="headerlink" title="main program"></a>main program</h1><ul>
+<li><strong>构建一个url存储仓库</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">urldatabase = []</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>构建一个问题页存储仓库</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wrongpages = []</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>获取检索结果信息(get search results information): start检索结果的开始数，resultnumber检索结果总数</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">resp = getresp(url=url,params=params,author=author)</span><br><span class="line">soup = BS(resp.text,<span class="string">&#x27;lxml&#x27;</span>)</span><br><span class="line">subtitle = soup.subtitle.contents[<span class="number">0</span>]</span><br><span class="line">d = re.search(<span class="string">r&#x27;Displaying&#x27;</span>,subtitle)</span><br><span class="line">t = re.search(<span class="string">r&#x27;to&#x27;</span>,subtitle)</span><br><span class="line">o = re.search(<span class="string">r&#x27;of&#x27;</span>,subtitle)</span><br><span class="line">tot = re.search(<span class="string">r&#x27;total&#x27;</span>,subtitle)</span><br><span class="line">start = <span class="built_in">int</span>(subtitle[d.end():t.start()])</span><br><span class="line">resultnumber = <span class="built_in">int</span>(subtitle[o.end():tot.start()])</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>计算检索结果总页面数–即主循环次数</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (resultnumber%rows) == <span class="number">0</span>:</span><br><span class="line">    pages = resultnumber//rows</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    pages = resultnumber//rows + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pages</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>下一次访问时records开始数</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nextstart = start</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>设置爬虫中断后再次开始时的重新启动位置,程序初始运行时为start值</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">restart = start  </span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># restart = start  # 程序中断后设置重新开始位置</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>main process loop</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(restart,pages):</span><br><span class="line">    nextstart = i*rows</span><br><span class="line">    params=&#123;<span class="string">&#x27;q&#x27;</span>: <span class="string">&#x27;footprint:&quot;Intersects(POLYGON((87.96744928079151 49.456519812462346,91.60830719023988 46.83752798473412,91.25136033637239 45.602765307819425,95.89166943664972 44.64576303006464,96.7483418859317 43.15413083756209,101.46004035698249 42.94545696139997,104.8153407833369 42.156611918760944,109.95537547902869 42.94545696139997,111.38316289449862 43.827415120460785,111.09760541140463 45.000210707779814,112.16844597300711 45.50278424803122,113.73901213002404 45.201773800610084,118.80765745494234 47.37203214140084,114.80985269162649 47.75739353110845,116.52319759019043 50.28470084157169,117.95098500566037 50.01021802911433,120.52100235350628 52.467671174043375,119.30738305035682 52.68458961189609,121.09211731969427 53.71091470506266,123.94769215063415 53.79533483672091,125.94659453229207 53.2862648577391,127.94549691395 49.96431767943767,130.8010717448899 48.943405599629216,131.30079734030437 48.044555096620655,135.2272127328467 48.61410385272944,135.01304462052622 47.66131893588616,133.51386783428276 44.747256163082966,131.80052293571885 45.000210707779814,131.30079734030437 42.52598030538988,121.80601102742924 38.176115746490154,123.59074529676666 37.612756017996006,120.23544487041231 35.14161329563284,122.16295788129669 32.23150772949295,123.23379844289917 30.278766301259637,118.73626808416886 23.994003317793286,112.5253928268746 21.159899865927372,110.59787981599015 18.676749577533087,110.81204792831065 20.62633973748771,107.52813687272979 20.96003728051427,105.74340260339234 22.617193193148964,101.46004035698252 20.96003728051427,99.10419112145709 21.75786247555702,97.46223559366666 24.31969121888956,97.96196118908115 27.46602416787246,95.32055447046173 28.72552358988112,93.03609460570983 27.719103082020624,89.82357292090245 27.21236283607496,86.61105123609507 27.402663295197584,81.89935276504427 29.66033159380234,78.11571611404891 31.32119224098024,78.11571611404891 34.261260362316236,77.47321177708743 35.19996972135458,74.76041568769453 36.530544485875296,73.33262827222458 38.84644093997744,73.33262827222458 39.949730443191925,75.3315306538825 40.98163678406533,76.25959247393799 41.03550801313756,77.68737988940791 41.518365501224054,79.75767164183932 42.262367141059,80.04322912493333 43.569347922768316,79.68628227106583 45.000210707779814,81.75657402349728 45.602765307819425,82.68463584355271 47.420357376064516,84.68353822521065 47.37203214140084,87.96744928079151 49.456519812462346,87.96744928079151 49.456519812462346)))&quot;&#x27;</span></span><br><span class="line">            + <span class="string">&#x27; AND filename:&#x27;</span>+ filename + <span class="string">&#x27; AND platformname:&#x27;</span> + platformname + <span class="string">&#x27; AND producttype:&#x27;</span> + producttype </span><br><span class="line">            + <span class="string">&#x27; AND beginposition:&#x27;</span> + beginposition + <span class="string">&#x27; AND endPosition:&#x27;</span> + endposition,</span><br><span class="line">            <span class="string">&#x27;orderby&#x27;</span>: orderby,</span><br><span class="line">            <span class="string">&#x27;start&#x27;</span>: nextstart,</span><br><span class="line">            <span class="string">&#x27;rows&#x27;</span>: rows&#125;</span><br><span class="line">    resp = getresp(url=url,params=params,author=author)</span><br><span class="line">    urllist = geturl(resp)</span><br><span class="line">    <span class="keyword">if</span> i &lt; pages-<span class="number">1</span>:</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(urllist) == rows:</span><br><span class="line">            urldatabase = urldatabase + urllist</span><br><span class="line">            print(<span class="string">&#x27;Page&#x27;</span>,i+<span class="number">1</span>,<span class="string">&#x27;: finished!&#x27;</span>,<span class="string">&#x27; ------ URL list length:&#x27;</span>,<span class="built_in">len</span>(urllist),<span class="string">&#x27; ------ records numbers&#x27;</span>,<span class="built_in">len</span>(urldatabase))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">&#x27;abstract url fail!&#x27;</span>)</span><br><span class="line">            wrongpages.append(i+<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(urllist) == (resultnumber - rows * i):</span><br><span class="line">            urldatabase = urldatabase + urllist</span><br><span class="line">            print(<span class="string">&#x27;Page&#x27;</span>,i+<span class="number">1</span>,<span class="string">&#x27;: finished!&#x27;</span>,<span class="string">&#x27; ------ URL list length:&#x27;</span>,<span class="built_in">len</span>(urllist),<span class="string">&#x27; ------ records numbers&#x27;</span>,<span class="built_in">len</span>(urldatabase))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            print(<span class="string">&#x27;abstract url fail!&#x27;</span>)</span><br><span class="line">            wrongpages.append(i+<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>当发生中断时，查看中断页数</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> i &lt; pages - <span class="number">1</span>:</span><br><span class="line">    print(<span class="string">&#x27;中断页数：&#x27;</span>,i)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>查看错误页信息</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wrongpages</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="保存爬取结果到的url"><a href="#保存爬取结果到的url" class="headerlink" title="保存爬取结果到的url"></a>保存爬取结果到的url</h2><ul>
+<li><strong>当我们用下载工具下载数据时同样需要用户名和密码，这里我们将其保存在url链接中</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(urldatabase)):</span><br><span class="line">    a = urldatabase[i]</span><br><span class="line">    urldatabase[i] = a[<span class="number">0</span>:<span class="number">8</span>] + user + <span class="string">&#x27;:&#x27;</span> + password + <span class="string">&#x27;@&#x27;</span> + a[<span class="number">8</span>::]</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">urldatabase_np = np.array(urldatabase)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>总检索结果可能包含上万个记录，当我们用工具下载时可能想把其分成若干个任务同时下载，这里我们可以通过设置单个文件纪录长度来实现：</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filelength = <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>根据单个文件记录长度计算文件数：</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filenumber = resultnumber//filelength + <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>保存爬取的检索结果到当前文件夹下</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> num <span class="keyword">in</span> <span class="built_in">range</span>(filenumber):</span><br><span class="line">    <span class="keyword">if</span> num &lt; filenumber - <span class="number">1</span>:</span><br><span class="line">        np.savetxt(<span class="string">&#x27;urls&#x27;</span> + <span class="built_in">str</span>(num*filelength+<span class="number">1</span>) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">str</span>((num+<span class="number">1</span>)*filelength) + <span class="string">&#x27;.txt&#x27;</span>,</span><br><span class="line">                   urldatabase_np[num*filelength:(num+<span class="number">1</span>)*filelength],fmt=<span class="string">&#x27;%s&#x27;</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        np.savetxt(<span class="string">&#x27;urls&#x27;</span> + <span class="built_in">str</span>(num*filelength+<span class="number">1</span>) + <span class="string">&#x27;-&#x27;</span> + <span class="built_in">str</span>(resultnumber) + <span class="string">&#x27;.txt&#x27;</span>,</span><br><span class="line">                   urldatabase_np[num*filelength:(num+<span class="number">1</span>)*filelength],fmt=<span class="string">&#x27;%s&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>至此我们就算是完成了所有遥感数据url爬取的任务，接下来你就可以用我们国内的某雷等工具来下载你想要的数据了。哨兵数据检索的重要参数请参考<a target="_blank" rel="noopener" href="https://scihub.copernicus.eu/userguide/" title="userguide">scihubuserguide</a>,<br>我已将我的notebook上传到我的<a href="/images/esa_rs_data_download/download.ipynb">GitHub仓库</a>欢迎参考，探讨。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Levin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://levin000.github.io/2018/%E5%93%A8%E5%85%B5%E9%81%A5%E6%84%9F%E6%95%B0%E6%8D%AE%E7%88%AC%E5%8F%96/" title="哨兵遥感数据爬取Python实现">http://levin000.github.io/2018/哨兵遥感数据爬取/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E9%81%A5%E6%84%9F%E5%BD%B1%E5%83%8F/" rel="tag"><i class="fa fa-tag"></i> 遥感影像</a>
+              <a href="/tags/%E7%88%AC%E8%99%AB/" rel="tag"><i class="fa fa-tag"></i> 爬虫</a>
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+              <a href="/tags/numpy/" rel="tag"><i class="fa fa-tag"></i> numpy</a>
+              <a href="/tags/bs4/" rel="tag"><i class="fa fa-tag"></i> bs4</a>
+              <a href="/tags/BeautifulSoup/" rel="tag"><i class="fa fa-tag"></i> BeautifulSoup</a>
+              <a href="/tags/requests/" rel="tag"><i class="fa fa-tag"></i> requests</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/MarkerDown-%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="MarkerDown-学习笔记">
+      <i class="fa fa-chevron-left"></i> MarkerDown-学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/%E9%87%8E%E5%A4%96%E8%B0%83%E7%A0%94%E4%BB%BB%E5%8A%A1%E4%B9%8B-%E5%BC%A0%E5%8C%97%E6%A0%91%E8%8A%AF%E9%87%87%E9%9B%86%E4%BB%BB%E5%8A%A1/" rel="next" title="张北树芯采集任务">
+      张北树芯采集任务 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E6%98%AF%E8%A6%81%E5%9C%A8python%E4%B8%AD%E5%AF%BC%E5%85%A5%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E7%9A%84%E6%A8%A1%E5%9D%97"><span class="nav-number">1.</span> <span class="nav-text">首先是要在python中导入我们需要的模块</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B7%A5%E6%AC%B2%E5%96%84%E5%85%B6%E4%BA%8B%EF%BC%8C%E5%BF%85%E5%85%88%E5%88%A9%E5%85%B6%E5%99%A8%E3%80%82%E6%8E%A5%E4%B8%8B%E9%87%8C%E6%88%91%E4%BB%AC%E8%A6%81%E6%9E%84%E5%BB%BA%E6%88%91%E4%BB%AC%E4%BD%BF%E7%94%A8%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">工欲善其事，必先利其器。接下里我们要构建我们使用的函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E7%BD%91%E7%AB%99respond%E7%9A%84%E5%87%BD%E6%95%B0"><span class="nav-number">2.1.</span> <span class="nav-text">获取网站respond的函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96respond%E4%B8%AD%E5%8C%85%E5%90%AB%E7%9A%84%E6%AF%8F%E6%9D%A1%E6%95%B0%E6%8D%AE%E7%9A%84%E9%93%BE%E6%8E%A5"><span class="nav-number">2.2.</span> <span class="nav-text">获取respond中包含的每条数据的链接</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A5%E4%B8%8B%E6%9D%A5%E6%97%B6%E6%88%91%E4%BB%AC%E7%88%AC%E5%8F%96%E6%95%B0%E6%8D%AE%E6%97%B6%E9%9C%80%E8%A6%81%E7%9A%84%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E7%AD%89%E5%8F%82%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">接下来时我们爬取数据时需要的用户信息等参数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A1%AB%E5%86%99%E8%87%AA%E5%B7%B1%E7%9A%84U-ser-Information"><span class="nav-number">3.1.</span> <span class="nav-text">填写自己的U ser Information</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF%E6%9E%84%E9%80%A0%E7%99%BB%E9%99%86%E4%BF%A1%E6%81%AF"><span class="nav-number">3.2.</span> <span class="nav-text">根据用户信息构造登陆信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%AB%99%E7%9A%84url%E4%BF%A1%E6%81%AF%EF%BC%8C%E6%A3%80%E7%B4%A2%E5%8F%82%E6%95%B0%E8%AE%BE%E5%AE%9A"><span class="nav-number">3.3.</span> <span class="nav-text">网站的url信息，检索参数设定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E7%BD%91%E7%AB%99%E7%9A%84%E6%A3%80%E7%B4%A2%E5%8F%82%E6%95%B0%E6%9E%84%E5%BB%BA%E6%A3%80%E7%B4%A2%E5%8F%82%E6%95%B0%E8%A1%A8-earch-parameters"><span class="nav-number">3.4.</span> <span class="nav-text">根据网站的检索参数构建检索参数表(earch parameters)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#main-program"><span class="nav-number">4.</span> <span class="nav-text">main program</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E7%88%AC%E5%8F%96%E7%BB%93%E6%9E%9C%E5%88%B0%E7%9A%84url"><span class="nav-number">4.1.</span> <span class="nav-text">保存爬取结果到的url</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Levin"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Levin</p>
+  <div class="site-description" itemprop="description">As simple as possible,<br> As complex as needed!</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="/leibin_w@163.com" title="E-Mail → leibin_w@163.com"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Levin</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">37k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">34 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<script>
+document.querySelectorAll('.pdfobject-container').forEach(element => {
+  let url = element.dataset.target;
+  let pdfOpenParams = {
+    navpanes : 0,
+    toolbar  : 0,
+    statusbar: 0,
+    pagemode : 'thumbs',
+    view     : 'FitH'
+  };
+  let pdfOpenFragment = '#' + Object.entries(pdfOpenParams).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+  let fullURL = `/lib/pdf/web/viewer.html?file=${encodeURIComponent(url)}${pdfOpenFragment}`;
+
+  if (NexT.utils.supportsPDFs()) {
+    element.innerHTML = `<embed class="pdfobject" src="${url + pdfOpenFragment}" type="application/pdf" style="height: ${element.dataset.height};">`;
+  } else {
+    element.innerHTML = `<iframe src="${fullURL}" style="height: ${element.dataset.height};" frameborder="0"></iframe>`;
+  }
+});
+</script>
+
+
+
+
+  
+
+  
+
+</body>
+</html>
